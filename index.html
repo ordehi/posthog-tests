@@ -1,11 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My GitHub Pages Site</title>
     <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
     <header>
         <h1>Welcome to My GitHub Pages Site</h1>
@@ -15,10 +17,21 @@
         <button id="clickMe">Click Me!</button>
         <p id="message"></p>
         <div class="container">
+            <h2>Version info</h2>
+            <pre>Tracking beforeunload event</pre>
             <h2>Configuration</h2>
             <pre id="config"></pre>
         </div>
     </main>
     <script src="script.js"></script>
+    <script>
+        // Track page leave event
+        function trackPageLeave() {
+            posthog.capture("beforeunload_ran");
+        }
+
+        window.addEventListener("beforeunload", trackPageLeave);
+    </script>
 </body>
+
 </html>
