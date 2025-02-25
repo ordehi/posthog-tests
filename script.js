@@ -44,7 +44,7 @@ posthog.setPersonPropertiesForFlags({'$current_url': window.location.href});
 
 posthog.onFeatureFlags(function() {
     // feature flags should be available at this point
-    if (posthog.isFeatureEnabled('new-feature') ) {
+    if (posthog.isFeatureEnabled('old-vs-new')) {
         console.log('old-vs-new is true');
         injectFeature('new-feature')
     } else {
