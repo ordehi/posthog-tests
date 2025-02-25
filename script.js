@@ -76,8 +76,12 @@ posthog.onFeatureFlags(function() {
 
 // Inject the new feature into the page
 function injectFeature(feature, flag) {
-    console.log('running injectFeature');
-    const featureDiv = document.createElement('div');
-    featureDiv.innerHTML = FEATURES[feature];
-    document.body.appendChild(featureDiv);
+    // Check if the feature already exists
+    if (!document.querySelector(`[data-feature="${feature}"]`)) {
+        const featureDiv = document.createElement('div');
+        featureDiv.setAttribute('data-feature', feature);
+        featureDiv.innerHTML = FEATURES[feature];
+        console.log('Detected flag value: ', flag);
+        document.body.appendChild(featureDiv);
+    }
 }
