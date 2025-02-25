@@ -25,12 +25,20 @@
     </main>
     <script src="script.js"></script>
     <script>
-        // Track page leave event
-        function trackPageLeave() {
-            posthog.capture("beforeunload_ran");
+        function trackPageLeave(callback) {
+            if (typeof callback !== "function") return;
+
+            const eventName = "onpagehide" in self ? "pagehide" : "unload";
+            window.addEventListener(eventName, callback, { once: true });
         }
 
-        window.addEventListener("beforeunload", trackPageLeave);
+        function handlePageLeave() {
+            if (window.posthog) {
+                window.posthog.capture("own_page_leave");
+            }
+        }
+
+        trackPageLeave(handlePageLeave);
     </script>
 </body>
 

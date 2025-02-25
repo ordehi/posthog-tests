@@ -40,11 +40,11 @@ posthog.onFeatureFlags(function() {
     }
 })
 
-if (posthog.isFeatureEnabled('new-feature') ) {
-    injectFeature('new-feature')
-} else {
-    injectFeature('old-feature')
-}
+// if (posthog.isFeatureEnabled('new-feature') ) {
+//     injectFeature('new-feature')
+// } else {
+//     injectFeature('old-feature')
+// }
 
 // Inject the new feature into the page
 function injectFeature(ff) {
