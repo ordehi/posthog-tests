@@ -62,8 +62,10 @@ posthog.setPersonPropertiesForFlags({'$current_url': window.location.href});
 // Ensure flags are loaded before usage.
 // You'll only need to call this on the code for when the first time a user visits.
 posthog.onFeatureFlags(function() {
+    console.log('running onFeatureFlags');
     // feature flags should be available at this point
     let flag = posthog.getFeatureFlag('old-vs-new');
+    console.log('Detected flag value: ', flag);
     if (flag  == 'test') {
         injectFeature('new-feature', flag);
     } else if (flag == 'control') {
@@ -74,8 +76,8 @@ posthog.onFeatureFlags(function() {
 
 // Inject the new feature into the page
 function injectFeature(feature, flag) {
+    console.log('running injectFeature');
     const featureDiv = document.createElement('div');
     featureDiv.innerHTML = FEATURES[feature];
-    console.log('Detected flag value: ', flag);
     document.body.appendChild(featureDiv);
 }
