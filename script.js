@@ -1,7 +1,7 @@
 const POSTHOG_CONFIG = {
     disable_compression: true,
     api_host: 'https://us.i.posthog.com',
-    person_profiles: 'identified_only',
+    person_profiles: 'always',
     debug: true
 };
 
