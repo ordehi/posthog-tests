@@ -41,18 +41,18 @@ posthog.init('phc_ddA554Xlja4bfLInShnZnM6b7d3Op1aQAaieWzw3oz7', POSTHOG_CONFIG)
 // Your flag depends on properties that are not instantly available. If you want
 // to make them available without waiting for server delays, send these properties for flag evaluation, like so:
 // Make sure to call this before evaluating flags. More info: https://posthog.com/docs/libraries/js#overriding-server-properties 
-posthog.setPersonPropertiesForFlags({'$current_url': window.location.href});
+// posthog.setPersonPropertiesForFlags({'$current_url': window.location.href});
 
-posthog.onFeatureFlags(function() {
-    // feature flags should be available at this point
-    if (posthog.isFeatureEnabled('old-vs-new')) {
-        console.log('old-vs-new is true');
-        injectFeature('new-feature')
-    } else {
-        console.log('old-vs-new is false');
-        injectFeature('old-feature')
-    }
-})
+// posthog.onFeatureFlags(function() {
+//     // feature flags should be available at this point
+//     if (posthog.isFeatureEnabled('old-vs-new')) {
+//         console.log('old-vs-new is true');
+//         injectFeature('new-feature')
+//     } else {
+//         console.log('old-vs-new is false');
+//         injectFeature('old-feature')
+//     }
+// })
 
 // Ensure flags are loaded before usage.
 // You'll only need to call this on the code for when the first time a user visits.
