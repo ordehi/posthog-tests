@@ -10,7 +10,7 @@
 
 <body>
     <header>
-        <h1>PostHog Tests</h1>
+        <h1 id="heading">PostHog Tests</h1>
     </header>
     <main>
         <p>This is a simple one-page website hosted on GitHub Pages.</p>
@@ -41,6 +41,27 @@
         }
 
         trackPageLeave(handlePageLeave);
+    </script>
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const heading = document.getElementById('#heading');
+            console.log('Running after DOMContentLoaded');
+            // Ensure PostHog is initialized and feature flags are loaded
+            posthog.onFeatureFlags(() => {
+                console.log('Running onFeatureFlags');
+                heading.textContent = 'The Juan Variable';
+                // const flagValue = posthog.getFeatureFlag('sandbox_embed');
+
+                // if (flagValue === 'with-sandbox') {
+                //     const sandboxDiv = document.querySelector('.homepage-sandbox');
+                //     if (sandboxDiv) {
+                //         sandboxDiv.style.display = 'block';
+                //     }
+                // }
+            }
+            );
+        }
+        );
     </script>
 </body>
 
