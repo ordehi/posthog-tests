@@ -43,12 +43,13 @@
         // trackPageLeave(handlePageLeave);
     </script>
     <script>
+        const cStyle = 'background-color: darkblue; color: white; font-style: italic; border: 5px solid hotpink; font-size: 2em;'
         document.addEventListener("DOMContentLoaded", () => {
             const heading = document.getElementById('heading');
-            console.log('Running after DOMContentLoaded');
+            console.log('%cRunning after DOMContentLoaded', cStyle);
             // Ensure PostHog is initialized and feature flags are loaded
             posthog.onFeatureFlags(() => {
-                console.log('Running onFeatureFlags');
+                console.log('%cRunning onFeatureFlags', cStyle);
                 heading.textContent = 'The Juan Variable';
                 // const flagValue = posthog.getFeatureFlag('sandbox_embed');
 
