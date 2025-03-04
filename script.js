@@ -2,7 +2,8 @@ const POSTHOG_CONFIG = {
     disable_compression: true,
     api_host: 'https://us.i.posthog.com',
     person_profiles: 'always',
-    debug: true
+    debug: true,
+    opt_in_site_apps: true
 };
 
 const FEATURES = {
