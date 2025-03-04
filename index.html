@@ -27,20 +27,20 @@
     </main>
     <script src="script.js"></script>
     <script>
-        function trackPageLeave(callback) {
-            if (typeof callback !== "function") return;
+        // function trackPageLeave(callback) {
+        //     if (typeof callback !== "function") return;
 
-            const eventName = "onpagehide" in self ? "pagehide" : "unload";
-            window.addEventListener(eventName, callback, { once: true });
-        }
+        //     const eventName = "onpagehide" in self ? "pagehide" : "unload";
+        //     window.addEventListener(eventName, callback, { once: true });
+        // }
 
-        function handlePageLeave() {
-            if (window.posthog) {
-                window.posthog.capture("own_page_leave");
-            }
-        }
+        // function handlePageLeave() {
+        //     if (window.posthog) {
+        //         window.posthog.capture("own_page_leave");
+        //     }
+        // }
 
-        trackPageLeave(handlePageLeave);
+        // trackPageLeave(handlePageLeave);
     </script>
     <script>
         document.addEventListener("DOMContentLoaded", () => {
