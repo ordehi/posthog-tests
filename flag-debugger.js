@@ -18,8 +18,17 @@
     // Create a unique namespace to avoid conflicts
     window.PostHogDebugger = window.PostHogDebugger || {};
     
-    // Only initialize once
-    if (window.PostHogDebugger.initialized) return;
+    // Store configuration
+    window.PostHogDebugger.config = config;
+    
+    // Only initialize once - if already initialized, just toggle visibility if needed
+    if (window.PostHogDebugger.initialized) {
+        if (config.displayMode === 'window') {
+            window.PostHogDebugger.show();
+        }
+        return;
+    }
+    
     window.PostHogDebugger.initialized = true;
     
     // First, hide all elements matching our target selector until we've checked the flags
@@ -58,6 +67,8 @@
         border: '1px solid #444',
         display: config.displayMode === 'window' ? 'block' : 'none' // Only show if displayMode is 'window'
     });
+    
+    console.log('%c[PostHogDebugger] Window should be visible: ' + (config.displayMode === 'window'), 'color: #2196F3;');
     
     // Set up status indicators
     const indicatorStyles = {
@@ -263,8 +274,21 @@
         if (document.body) {
             document.body.appendChild(debugContainer);
             
+            // Ensure the container is visible in window mode
+            if (config.displayMode === 'window') {
+                debugContainer.style.display = 'block';
+                console.log('%c[PostHogDebugger] Debug window added to document, should be visible', 'color: #2196F3;');
+            }
+            
             // Setup event listeners for the configuration form
             setupConfigFormListeners();
+            
+            // Trigger a show with slight delay to overcome any CSS that might hide it
+            setTimeout(() => {
+                if (config.displayMode === 'window') {
+                    debugContainer.style.display = 'block';
+                }
+            }, 500);
         } else {
             // If body doesn't exist yet, retry in a moment
             setTimeout(addContainerToDocument, 10);
@@ -697,11 +721,14 @@
     
     // Toggle debugger visibility
     window.PostHogDebugger.toggleVisibility = () => {
-        if (debugContainer.style.display === 'none') {
-            debugContainer.style.display = 'block';
-        } else {
-            debugContainer.style.display = 'none';
-        }
+        debugContainer.style.display = debugContainer.style.display === 'none' ? 'block' : 'none';
+        console.log('%c[PostHogDebugger] Toggled visibility to: ' + debugContainer.style.display, 'color: #2196F3;');
+    };
+    
+    // Force show debug window
+    window.PostHogDebugger.show = () => {
+        debugContainer.style.display = 'block';
+        console.log('%c[PostHogDebugger] Forced window visibility', 'color: #2196F3;');
     };
     
     // Allow updating configuration
