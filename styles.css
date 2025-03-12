@@ -418,6 +418,91 @@ footer {
     background-color: rgba(36, 180, 126, 0.05);
 }
 
+/* Tabs */
+.tabs {
+    display: flex;
+    margin-top: 20px;
+    border-bottom: 1px solid #ddd;
+}
+
+.tab-button {
+    background: #f8f9fa;
+    border: 1px solid #ddd;
+    border-bottom: none;
+    padding: 10px 15px;
+    margin-right: 5px;
+    border-radius: 4px 4px 0 0;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    transition: background-color 0.2s;
+}
+
+.tab-button:hover {
+    background-color: #f0f0f0;
+}
+
+.tab-button.active {
+    background-color: white;
+    border-bottom: 1px solid white;
+    margin-bottom: -1px;
+    color: var(--primary-color);
+}
+
+.tab-content {
+    display: none;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+/* Table styles for SQL results */
+.sql-results-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+    font-size: 14px;
+}
+
+.sql-results-table th {
+    background-color: #f0f0f0;
+    padding: 8px 12px;
+    text-align: left;
+    font-weight: 600;
+    border: 1px solid #ddd;
+}
+
+.sql-results-table td {
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    max-width: 300px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.sql-results-table tr:nth-child(even) {
+    background-color: #f8f9fa;
+}
+
+.sql-results-table tr:hover {
+    background-color: #f0f8ff;
+}
+
+.query-details {
+    margin-top: 15px;
+    font-size: 12px;
+    color: #666;
+}
+
+.query-details pre {
+    margin-top: 5px;
+    padding: 8px;
+    font-size: 12px;
+    max-height: 150px;
+}
+
 /* Media Queries */
 @media (max-width: 768px) {
     header {

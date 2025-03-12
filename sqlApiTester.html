@@ -61,9 +61,23 @@
                 <span class="status" id="status"></span>
             </div>
 
-            <div class="output-container">
-                <button class="copy-button" id="copy-button" style="display: none;">Copy</button>
-                <div id="output" class="output-placeholder">Query results will appear here</div>
+            <div class="tabs">
+                <button class="tab-button active" data-tab="formatted">Formatted Results</button>
+                <button class="tab-button" data-tab="raw">Raw JSON Response</button>
+            </div>
+            
+            <div class="tab-content active" id="formatted-tab">
+                <div class="output-container">
+                    <button class="copy-button" id="copy-formatted-button" style="display: none;">Copy</button>
+                    <div id="formatted-output" class="output-placeholder">Formatted query results will appear here</div>
+                </div>
+            </div>
+            
+            <div class="tab-content" id="raw-tab">
+                <div class="output-container">
+                    <button class="copy-button" id="copy-raw-button" style="display: none;">Copy</button>
+                    <div id="raw-output" class="output-placeholder">Raw JSON response will appear here</div>
+                </div>
             </div>
         </div>
     </main>
