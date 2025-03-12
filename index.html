@@ -1,48 +1,71 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PostHog Tests</title>
-    <link rel="stylesheet" href="style.css">
+    <title>PostHog Tools Hub</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="posthog.js"></script>
 </head>
-
 <body>
     <header>
-        <h1 id="heading">PostHog Tests</h1>
+        <h1>PostHog Tools Hub</h1>
+        <p class="subtitle">Collection of useful tools for PostHog users</p>
     </header>
+    
+    <nav>
+        <ul>
+            <li><a href="index.html" class="active">Home</a></li>
+            <li><a href="feature-flag-debugger.html">Feature Flag Debugger</a></li>
+            <li><a href="sql-client.html">SQL Client</a></li>
+            <!-- Add new pages here as they become available -->
+        </ul>
+    </nav>
+
     <main>
-        <p>This is a simple one-page website hosted on GitHub Pages.</p>
-        <label for="userid">User ID</label>
-        <input type="text" id="userid" name="userid">
-        <button id="clickMe">Identify</button>
-        <p id="message"></p>
-        <div class="container">
-            <h2>Version info</h2>
-            <pre>Tracking beforeunload event</pre>
-            <h2>Configuration</h2>
-            <pre id="config"></pre>
+        <div class="card">
+            <h2>Welcome to PostHog Tools Hub</h2>
+            <p>This is a collection of useful tools for PostHog users. These tools are designed to help you debug, analyze, and work with PostHog more effectively.</p>
+            
+            <div class="info-box">
+                <strong>Note:</strong> These tools are for demonstration and debugging purposes. Always ensure you're following best security practices when handling API keys and sensitive data.
+            </div>
+        </div>
+
+        <h2>Available Tools</h2>
+        
+        <div class="card-grid">
+            <div class="card">
+                <h3>Feature Flag Debugger</h3>
+                <p>A tool to help diagnose race conditions and timing issues with PostHog feature flags and DOM interactions.</p>
+                <div class="button-container">
+                    <a href="onFeatureFlags.html" class="btn">Open Tool</a>
+                </div>
+            </div>
+            
+            <div class="card">
+                <h3>SQL Client</h3>
+                <p>Run SQL queries against your PostHog instance to fetch and analyze your data directly.</p>
+                <div class="button-container">
+                    <a href="sqlApiTester.html" class="btn">Open Tool</a>
+                </div>
+            </div>
+            
+            <!-- Template for adding new tool cards -->
+            <!--
+            <div class="card">
+                <h3>Tool Name</h3>
+                <p>Brief description of the tool and what it does.</p>
+                <div class="button-container">
+                    <a href="tool-page.html" class="btn">Open Tool</a>
+                </div>
+            </div>
+            -->
         </div>
     </main>
-    <script src="script.js"></script>
-    <script>
-        // function trackPageLeave(callback) {
-        //     if (typeof callback !== "function") return;
 
-        //     const eventName = "onpagehide" in self ? "pagehide" : "unload";
-        //     window.addEventListener(eventName, callback, { once: true });
-        // }
-
-        // function handlePageLeave() {
-        //     if (window.posthog) {
-        //         window.posthog.capture("own_page_leave");
-        //     }
-        // }
-
-        // trackPageLeave(handlePageLeave);
-    </script>
-    <script src="flagDebugger.js"></script>
+    <footer>
+        <p>PostHog Tools Hub | For demonstration and debugging purposes only</p>
+    </footer>
 </body>
-
 </html>
