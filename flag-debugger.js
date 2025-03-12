@@ -332,8 +332,10 @@
             }
         });
         
-        // Generate URL button
+        // Get reference to the generate URL button
         const generateUrlButton = document.getElementById('ph-debug-generate-url');
+        
+        // Generate URL button
         if (generateUrlButton) {
             generateUrlButton.addEventListener('click', () => {
                 const flagName = document.getElementById('ph-debug-flag-name').value;
@@ -378,8 +380,7 @@
             });
         }
         
-        // Generate URL on load
-        const generateUrlButton = document.getElementById('ph-debug-generate-url');
+        // Generate URL on load - use the button reference we already have
         if (generateUrlButton) {
             generateUrlButton.click();
         }
@@ -615,7 +616,7 @@
         updateElementDisplay(targetElement);
     }
     
-                // Create mock element if needed
+    // Create mock element if needed
     function createMockElement() {
         // Double-check flag value before creating mock
         const flagValue = window.posthog.getFeatureFlag(config.flagName);
