@@ -14,29 +14,23 @@
 
     <nav>
         <ul>
-            <li><a href="index.html">Home</a></li>
-            <li><a href="flag-debugger.html" class="active">Feature Flag Debugger</a></li>
-            <li><a href="sql-client.html">SQL Client</a></li>
-            <!-- Add new pages here as they become available -->
+            <li><a href="#" class="active">Flag Debugger</a></li>
+            <li><a href="#">Setup Instructions</a></li>
+            <li><a href="#">Documentation</a></li>
         </ul>
     </nav>
 
     <main>
         <div class="card">
-            <h2>Race Condition Tester</h2>
-            <p>This page helps you debug timing and race condition issues with PostHog feature flags and DOM interactions.</p>
+            <h2>Flag Debugger Configuration</h2>
+            <p>Use this tool to generate a URL with the right parameters for the feature flag debugger.</p>
             
             <div class="info-box">
-                <strong>Note:</strong> The debugger script will create a visual overlay in the corner of your screen showing the status of each step in the feature flag process.
+                <strong>How it works:</strong> The debugger script only activates when the <code>?debugPHFlags</code> parameter is present in the URL. You can configure the debugger with additional parameters to check specific flags, target elements, and control its behavior.
             </div>
-
-            <div class="controls">
-                <button id="reload-btn" class="btn">Reload Page</button>
-                <button id="clear-console-btn" class="btn secondary">Clear Console</button>
-            </div>
-
+            
             <div class="mock-area" id="mock-area">
-                <h3>Sandbox Element Container</h3>
+                <h3>Test Area</h3>
                 <p>This area contains a <code>.homepage-sandbox</code> element that will be shown when the feature flag is enabled.</p>
                 
                 <div class="homepage-sandbox">
@@ -44,7 +38,50 @@
                     <p>This content should only be visible when the PostHog feature flag <code>sandbox_embed</code> is set to <code>with-sandbox</code>.</p>
                 </div>
             </div>
-
+            
+            <div class="param-form">
+                <h3>Configure Debugger Parameters</h3>
+                
+                <div class="form-group">
+                    <label for="flag-name">Flag Name:</label>
+                    <input type="text" id="flag-name" value="sandbox_embed" placeholder="Enter feature flag name">
+                </div>
+                
+                <div class="form-group">
+                    <label for="flag-value">Expected Flag Value:</label>
+                    <input type="text" id="flag-value" value="with-sandbox" placeholder="Enter expected value">
+                </div>
+                
+                <div class="form-group">
+                    <label for="selector">Target Element Selector:</label>
+                    <input type="text" id="selector" value=".homepage-sandbox" placeholder="CSS selector (e.g., .class-name, #element-id)">
+                </div>
+                
+                <div class="form-group">
+                    <label for="container">Container Selector (for mock elements):</label>
+                    <input type="text" id="container" placeholder="CSS selector for container (optional)">
+                </div>
+                
+                <div class="form-group">
+                    <label for="display-mode">Display Mode:</label>
+                    <select id="display-mode">
+                        <option value="console">Console Only</option>
+                        <option value="window">Console + Visual Debugger</option>
+                    </select>
+                </div>
+                
+                <button id="generate-url" class="btn">Generate URL</button>
+            </div>
+            
+            <div class="url-preview" id="url-preview">
+                Generated URL will appear here
+            </div>
+            
+            <div class="controls">
+                <button id="copy-url" class="btn secondary">Copy URL</button>
+                <button id="test-url" class="btn">Test on this page</button>
+            </div>
+            
             <div id="mock-posthog-controls">
                 <h3>Mock PostHog Controls</h3>
                 <p>Use these options to simulate different PostHog loading behaviors:</p>
@@ -52,6 +89,7 @@
                 <div class="controls">
                     <button id="init-posthog-btn" class="btn">Initialize Mock PostHog</button>
                     <button id="toggle-flag-btn" class="btn secondary">Toggle Feature Flag</button>
+                    <button id="toggle-debugger-btn" class="btn secondary">Toggle Debugger Window</button>
                 </div>
                 
                 <div class="warning-box">
@@ -68,34 +106,85 @@
                     <div class="step-number">1</div>
                     <div class="step-content">
                         <h3>Add the debugger script to your page</h3>
-                        <p>Include the debugger script in your HTML file:</p>
-                        <pre>&lt;script src="flagDebugger.js"&gt;&lt;/script&gt;</pre>
+                        <p>Include the enhanced flag debugger script in your HTML file:</p>
+                        <pre>&lt;script src="enhanced-flag-debugger.js"&gt;&lt;/script&gt;</pre>
+                        <p>Add this script after your PostHog initialization code to ensure it can detect PostHog properly.</p>
                     </div>
                 </div>
                 
                 <div class="step">
                     <div class="step-number">2</div>
                     <div class="step-content">
-                        <h3>Check the visual debugger</h3>
-                        <p>Look for the debugger panel in the bottom-right corner of your screen. It shows the status of each step in real-time.</p>
+                        <h3>Enable the debugger with URL parameters</h3>
+                        <p>The debugger only activates when you include <code>?debugPHFlags</code> in your URL. This ensures regular users don't see debugging information.</p>
+                        <pre>https://yourdomain.com/yourpage?debugPHFlags</pre>
+                        <p>By default, this will only log to the console and check for the <code>sandbox_embed</code> flag with an expected value of <code>with-sandbox</code>.</p>
                     </div>
                 </div>
                 
                 <div class="step">
                     <div class="step-number">3</div>
                     <div class="step-content">
-                        <h3>Analyze console logs</h3>
-                        <p>Open your browser's developer tools (F12) and check the console for detailed timing information.</p>
+                        <h3>Configure the debugger using URL parameters</h3>
+                        <p>Customize the debugger behavior with additional parameters:</p>
+                        <pre>https://yourdomain.com/yourpage?debugPHFlags&flag_name=my_flag&flag_value=true&selector=.my-element&mode=window</pre>
+                        <p><strong>Available parameters:</strong></p>
+                        <ul>
+                            <li><code>flag_name</code>: The name of the feature flag to check (default: <code>sandbox_embed</code>)</li>
+                            <li><code>flag_value</code>: The expected value of the flag (default: <code>with-sandbox</code>)</li>
+                            <li><code>selector</code>: CSS selector for the element to check/inject (default: <code>.homepage-sandbox</code>)</li>
+                            <li><code>container</code>: Where to inject a mock element if needed (default: <code>body</code>)</li>
+                            <li><code>mode</code>: Set to <code>window</code> to display the visual debugger (default: <code>console</code>)</li>
+                        </ul>
                     </div>
                 </div>
                 
                 <div class="step">
                     <div class="step-number">4</div>
                     <div class="step-content">
-                        <h3>Generate a debugging report</h3>
-                        <p>Run the following in your console to get a complete report:</p>
-                        <pre>window.PostHogDebugger.getDebugReport()</pre>
+                        <h3>Analyze the results</h3>
+                        <p>The debugger provides detailed information in two ways:</p>
+                        <ol>
+                            <li><strong>Console logs:</strong> Check your browser's developer tools (F12) for timing data and status updates.</li>
+                            <li><strong>Visual debugger:</strong> If <code>mode=window</code> is set, a debugger panel appears in the bottom-right corner with real-time status indicators.</li>
+                        </ol>
+                        <p>You can also access the debug data programmatically:</p>
+                        <pre>// Get complete debug report
+window.PostHogDebugger.getDebugReport()
+
+// Toggle visibility of the debugger panel
+window.PostHogDebugger.toggleVisibility()</pre>
                     </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>Common Use Cases</h2>
+            
+            <div class="card-grid">
+                <div class="card">
+                    <h3>Troubleshoot Race Conditions</h3>
+                    <p>Identify timing issues between PostHog flag loading and DOM element visibility.</p>
+                    <p>URL configuration:</p>
+                    <pre>?debugPHFlags&mode=window</pre>
+                    <button class="btn secondary">Copy URL</button>
+                </div>
+                
+                <div class="card">
+                    <h3>Test Specific Flags</h3>
+                    <p>Check if a particular feature flag is loading with the expected value.</p>
+                    <p>URL configuration:</p>
+                    <pre>?debugPHFlags&flag_name=custom_feature&flag_value=enabled</pre>
+                    <button class="btn secondary">Copy URL</button>
+                </div>
+                
+                <div class="card">
+                    <h3>Validate Element Visibility</h3>
+                    <p>Confirm that specific elements are properly shown/hidden based on flags.</p>
+                    <p>URL configuration:</p>
+                    <pre>?debugPHFlags&selector=.feature-container&mode=window</pre>
+                    <button class="btn secondary">Copy URL</button>
                 </div>
             </div>
         </div>
@@ -154,26 +243,93 @@
             console.log(`Mock PostHog: Feature flag 'sandbox_embed' set to ${flagEnabled ? "'with-sandbox'" : "'disabled'"}`);
         }
 
+        // Generate URL from form values
+        function generateUrl() {
+            const flagName = document.getElementById('flag-name').value;
+            const flagValue = document.getElementById('flag-value').value;
+            const selector = document.getElementById('selector').value;
+            const container = document.getElementById('container').value;
+            const displayMode = document.getElementById('display-mode').value;
+            
+            let url = new URL(window.location.href);
+            url.search = '';
+            url.searchParams.set('debugPHFlags', '');
+            
+            if (flagName) url.searchParams.set('flag_name', flagName);
+            if (flagValue) url.searchParams.set('flag_value', flagValue);
+            if (selector) url.searchParams.set('selector', selector);
+            if (container) url.searchParams.set('container', container);
+            if (displayMode !== 'console') url.searchParams.set('mode', displayMode);
+            
+            document.getElementById('url-preview').textContent = url.toString();
+        }
+
         // Button handlers
-        document.getElementById('reload-btn').addEventListener('click', () => {
-            location.reload();
-        });
-
-        document.getElementById('clear-console-btn').addEventListener('click', () => {
-            console.clear();
-            console.log("Console cleared");
-        });
-
-        document.getElementById('init-posthog-btn').addEventListener('click', () => {
-            initMockPostHog();
-        });
-
-        document.getElementById('toggle-flag-btn').addEventListener('click', () => {
-            toggleFeatureFlag();
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize form handlers
+            document.getElementById('generate-url').addEventListener('click', generateUrl);
+            
+            document.getElementById('copy-url').addEventListener('click', function() {
+                const url = document.getElementById('url-preview').textContent;
+                if (url && url !== 'Generated URL will appear here') {
+                    navigator.clipboard.writeText(url).then(() => {
+                        alert('URL copied to clipboard!');
+                    });
+                } else {
+                    alert('Please generate a URL first');
+                }
+            });
+            
+            document.getElementById('test-url').addEventListener('click', function() {
+                const url = document.getElementById('url-preview').textContent;
+                if (url && url !== 'Generated URL will appear here') {
+                    window.location.href = url;
+                } else {
+                    alert('Please generate a URL first');
+                }
+            });
+            
+            document.getElementById('init-posthog-btn').addEventListener('click', initMockPostHog);
+            
+            document.getElementById('toggle-flag-btn').addEventListener('click', toggleFeatureFlag);
+            
+            document.getElementById('toggle-debugger-btn').addEventListener('click', function() {
+                if (window.PostHogDebugger && typeof window.PostHogDebugger.toggleVisibility === 'function') {
+                    window.PostHogDebugger.toggleVisibility();
+                } else {
+                    alert('Debugger is not active. Add ?debugPHFlags to your URL first.');
+                }
+            });
+            
+            // Initialize URL preview with current URL parameters
+            if (window.location.search.includes('debugPHFlags')) {
+                document.getElementById('url-preview').textContent = window.location.href;
+                
+                // Populate form fields from URL
+                const urlParams = new URLSearchParams(window.location.search);
+                if (urlParams.has('flag_name')) {
+                    document.getElementById('flag-name').value = urlParams.get('flag_name');
+                }
+                if (urlParams.has('flag_value')) {
+                    document.getElementById('flag-value').value = urlParams.get('flag_value');
+                }
+                if (urlParams.has('selector')) {
+                    document.getElementById('selector').value = urlParams.get('selector');
+                }
+                if (urlParams.has('container')) {
+                    document.getElementById('container').value = urlParams.get('container');
+                }
+                if (urlParams.has('mode')) {
+                    document.getElementById('display-mode').value = urlParams.get('mode');
+                }
+            } else {
+                // Generate default URL
+                generateUrl();
+            }
         });
     </script>
 
-    <script src="posthog.js"></script>
-    <script src="flag-debugger.js"></script>
+    <!-- The script tag below is where you would include the enhanced-flag-debugger.js file -->
+    <script src="flag-debugger.js"></script> -->
 </body>
 </html>

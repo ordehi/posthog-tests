@@ -1,10 +1,29 @@
 (function() {
+    // Check if debugging is enabled via URL parameter
+    const urlParams = new URLSearchParams(window.location.search);
+    
+    // Only initialize if ?debugPHFlags is present in the URL
+    if (!urlParams.has('debugPHFlags')) {
+        return; // Exit early if not enabled
+    }
+    
+    // Get configuration from URL parameters
+    const config = {
+        flagName: urlParams.get('flag_name') || 'sandbox_embed',
+        flagValue: urlParams.get('flag_value') || 'with-sandbox',
+        selector: urlParams.get('selector') || '.homepage-sandbox',
+        displayMode: urlParams.get('mode') || 'console' // 'console' or 'window'
+    };
+    
     // Create a unique namespace to avoid conflicts
     window.PostHogDebugger = window.PostHogDebugger || {};
     
     // Only initialize once
     if (window.PostHogDebugger.initialized) return;
     window.PostHogDebugger.initialized = true;
+    
+    // Store configuration
+    window.PostHogDebugger.config = config;
     
     // Create visual indicator container
     const debugContainer = document.createElement('div');
@@ -28,7 +47,8 @@
         overflowY: 'auto',
         transition: 'all 0.3s ease',
         opacity: '0.9',
-        border: '1px solid #444'
+        border: '1px solid #444',
+        display: config.displayMode === 'window' ? 'block' : 'none' // Only show if displayMode is 'window'
     });
     
     // Set up status indicators
@@ -77,15 +97,31 @@
         posthogAvailable: createIndicator('PostHog Available'),
         onFeatureFlagsAvailable: createIndicator('onFeatureFlags Available'),
         featureFlagsLoaded: createIndicator('Feature Flags Loaded'),
-        flagValue: createIndicator('sandbox_embed Flag'),
-        sandboxElement: createIndicator('Sandbox Element'),
-        sandboxDisplayed: createIndicator('Sandbox Displayed')
+        flagValue: createIndicator(`${config.flagName} Flag`),
+        targetElement: createIndicator(`Target Element (${config.selector})`),
+        elementDisplayed: createIndicator('Element Displayed')
     };
     
     // Add indicators to container
     Object.values(indicators).forEach(indicator => {
         debugContainer.appendChild(indicator.container);
     });
+    
+    // Add configuration display
+    const configDisplay = document.createElement('div');
+    configDisplay.style.margin = '10px 0';
+    configDisplay.style.padding = '8px';
+    configDisplay.style.background = 'rgba(255, 255, 255, 0.1)';
+    configDisplay.style.borderRadius = '4px';
+    configDisplay.style.fontSize = '11px';
+    configDisplay.innerHTML = `
+        <strong>Configuration:</strong><br>
+        Flag Name: ${config.flagName}<br>
+        Expected Value: ${config.flagValue}<br>
+        Target Selector: ${config.selector}<br>
+        Display Mode: ${config.displayMode}
+    `;
+    debugContainer.appendChild(configDisplay);
     
     // Add expand/collapse button
     const toggleButton = document.createElement('button');
@@ -106,10 +142,12 @@
         minimized = !minimized;
         if (minimized) {
             Object.values(indicators).forEach(ind => ind.container.style.display = 'none');
+            configDisplay.style.display = 'none';
             toggleButton.textContent = 'Expand';
             debugContainer.style.padding = '5px';
         } else {
             Object.values(indicators).forEach(ind => ind.container.style.display = 'flex');
+            configDisplay.style.display = 'block';
             toggleButton.textContent = 'Minimize';
             debugContainer.style.padding = '10px';
         }
@@ -283,7 +321,7 @@
         if (window.posthog.featureFlags && window.posthog.featureFlags.flagsLoaded) {
             const time = logEvent('FeatureFlagsAlreadyLoaded', 'info', 'Feature flags were already loaded');
             updateStatus(indicators.featureFlagsLoaded, 'success', `Already loaded (${time.toFixed(0)}ms)`);
-            checkSandboxFlag();
+            checkSpecificFlag();
             return;
         }
         
@@ -293,121 +331,130 @@
         window.posthog.onFeatureFlags(() => {
             const time = logEvent('FeatureFlagsLoaded', 'success', 'Feature flags loaded');
             updateStatus(indicators.featureFlagsLoaded, 'success', `Loaded (${time.toFixed(0)}ms)`);
-            checkSandboxFlag();
+            checkSpecificFlag();
         });
     }
     
     // Check the specific flag
-    function checkSandboxFlag() {
+    function checkSpecificFlag() {
         try {
-            const flagValue = window.posthog.getFeatureFlag('sandbox_embed');
+            const flagValue = window.posthog.getFeatureFlag(config.flagName);
             
             if (flagValue === null || flagValue === undefined) {
-                const time = logEvent('FlagCheck', 'warning', 'sandbox_embed flag not found', { value: flagValue });
+                const time = logEvent('FlagCheck', 'warning', `${config.flagName} flag not found`, { value: flagValue });
                 updateStatus(indicators.flagValue, 'warning', `Not found (${time.toFixed(0)}ms)`);
                 
-                // Skip sandbox element check since flag is not found
-                updateStatus(indicators.sandboxElement, 'info', 'Skipped (flag not found)');
-                updateStatus(indicators.sandboxDisplayed, 'info', 'Skipped (flag not found)');
+                // Skip element check since flag is not found
+                updateStatus(indicators.targetElement, 'info', 'Skipped (flag not found)');
+                updateStatus(indicators.elementDisplayed, 'info', 'Skipped (flag not found)');
                 return;
-            } else if (flagValue === 'with-sandbox') {
-                const time = logEvent('FlagCheck', 'success', 'Flag is set to with-sandbox', { value: flagValue });
-                updateStatus(indicators.flagValue, 'success', `Value: with-sandbox (${time.toFixed(0)}ms)`);
+            } else if (flagValue === config.flagValue) {
+                const time = logEvent('FlagCheck', 'success', `Flag is set to ${config.flagValue}`, { value: flagValue });
+                updateStatus(indicators.flagValue, 'success', `Value: ${config.flagValue} (${time.toFixed(0)}ms)`);
                 
-                // Only proceed to check for sandbox element if flag is correctly set
-                checkSandboxElement();
+                // Only proceed to check for target element if flag is correctly set
+                checkTargetElement();
             } else {
                 const time = logEvent('FlagCheck', 'info', `Flag value: ${flagValue}`, { value: flagValue });
                 updateStatus(indicators.flagValue, 'info', `Value: ${flagValue} (${time.toFixed(0)}ms)`);
                 
                 // Log that we're skipping due to incorrect flag value
-                logEvent('SandboxSkipped', 'info', `Skipping sandbox display (flag value '${flagValue}' != 'with-sandbox')`);
-                updateStatus(indicators.sandboxElement, 'info', `Skipped (flag value '${flagValue}')`);
-                updateStatus(indicators.sandboxDisplayed, 'info', `Skipped (flag value '${flagValue}')`);
+                logEvent('ElementSkipped', 'info', `Skipping element display (flag value '${flagValue}' != '${config.flagValue}')`);
+                updateStatus(indicators.targetElement, 'info', `Skipped (unexpected flag value '${flagValue}')`);
+                updateStatus(indicators.elementDisplayed, 'info', `Skipped (unexpected flag value '${flagValue}')`);
                 return;
             }
         } catch (error) {
             const time = logEvent('FlagCheckError', 'error', 'Error checking flag', { error });
             updateStatus(indicators.flagValue, 'error', `Error: ${error.message} (${time.toFixed(0)}ms)`);
             
-            // Skip sandbox checks on error
-            updateStatus(indicators.sandboxElement, 'error', 'Skipped (flag error)');
-            updateStatus(indicators.sandboxDisplayed, 'error', 'Skipped (flag error)');
+            // Skip element checks on error
+            updateStatus(indicators.targetElement, 'error', 'Skipped (flag error)');
+            updateStatus(indicators.elementDisplayed, 'error', 'Skipped (flag error)');
         }
     }
     
-    // Check for sandbox element
-    function checkSandboxElement() {
-        const sandboxDiv = document.querySelector('.homepage-sandbox');
+    // Check for target element
+    function checkTargetElement() {
+        const targetElement = document.querySelector(config.selector);
         
-        if (!sandboxDiv) {
-            const time = logEvent('SandboxElementCheck', 'error', 'Sandbox element not found');
-            updateStatus(indicators.sandboxElement, 'error', `Not found (${time.toFixed(0)}ms)`);
+        if (!targetElement) {
+            const time = logEvent('TargetElementCheck', 'error', `Target element not found (${config.selector})`);
+            updateStatus(indicators.targetElement, 'error', `Not found (${time.toFixed(0)}ms)`);
             
-            // Create a mock sandbox element for demonstration
-            createMockSandbox();
+            // Create a mock element for demonstration when appropriate
+            if (config.flagValue === window.posthog.getFeatureFlag(config.flagName)) {
+                createMockElement();
+            }
             return;
         }
         
-        const time = logEvent('SandboxElementCheck', 'success', 'Sandbox element found', {
-            id: sandboxDiv.id,
-            className: sandboxDiv.className,
-            display: window.getComputedStyle(sandboxDiv).display
+        const time = logEvent('TargetElementCheck', 'success', 'Target element found', {
+            id: targetElement.id,
+            className: targetElement.className,
+            display: window.getComputedStyle(targetElement).display
         });
         
-        updateStatus(indicators.sandboxElement, 'success', `Found (${time.toFixed(0)}ms)`);
+        updateStatus(indicators.targetElement, 'success', `Found (${time.toFixed(0)}ms)`);
         
-        // Update sandbox display
-        updateSandboxDisplay(sandboxDiv);
+        // Update element display
+        updateElementDisplay(targetElement);
     }
     
-    // Create mock sandbox if needed
-    function createMockSandbox() {
+    // Create mock element if needed
+    function createMockElement() {
         // Double-check flag value before creating mock
-        const flagValue = window.posthog.getFeatureFlag('sandbox_embed');
-        if (flagValue !== 'with-sandbox') {
-            const time = logEvent('MockSandboxSkipped', 'warning', 
-                `Not creating mock sandbox: flag value '${flagValue}' is not 'with-sandbox'`);
-            updateStatus(indicators.sandboxElement, 'warning', 
+        const flagValue = window.posthog.getFeatureFlag(config.flagName);
+        if (flagValue !== config.flagValue) {
+            const time = logEvent('MockElementSkipped', 'warning', 
+                `Not creating mock element: flag value '${flagValue}' is not '${config.flagValue}'`);
+            updateStatus(indicators.targetElement, 'warning', 
                 `Mock not created (incorrect flag) (${time.toFixed(0)}ms)`);
-            updateStatus(indicators.sandboxDisplayed, 'info', 
-                `Skipped (no sandbox with correct flag)`);
+            updateStatus(indicators.elementDisplayed, 'info', 
+                `Skipped (no element with correct flag)`);
             return;
         }
         
-        const mockSandbox = document.createElement('div');
-        mockSandbox.className = 'homepage-sandbox mock-sandbox';
-        mockSandbox.style.display = 'none';
+        const mockElement = document.createElement('div');
+        mockElement.className = `mock-element ${config.selector.replace(/^\./, '')}`;
+        mockElement.style.display = 'none';
         
         // Add some content to make it visible
-        mockSandbox.innerHTML = `
+        mockElement.innerHTML = `
             <div style="background: #f5f5f5; border: 1px solid #ccc; padding: 15px; 
                         border-radius: 5px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
-                <h3 style="margin: 0 0 10px; color: #333; font-family: sans-serif;">Mock Sandbox Element</h3>
+                <h3 style="margin: 0 0 10px; color: #333; font-family: sans-serif;">Mock Element (${config.selector})</h3>
                 <p style="margin: 0; color: #666; font-family: sans-serif;">
-                    This is a mock sandbox element created by the PostHog debugger 
-                    since no element with class '.homepage-sandbox' was found 
-                    and the 'sandbox_embed' flag is set to 'with-sandbox'.
+                    This is a mock element created by the PostHog debugger 
+                    since no element with selector '${config.selector}' was found 
+                    and the '${config.flagName}' flag is set to '${config.flagValue}'.
                 </p>
             </div>
         `;
         
-        // Add to body
-        document.body.appendChild(mockSandbox);
+        // Find the first valid container to append to
+        let targetContainer = document.body;
+        const customContainer = document.querySelector(urlParams.get('container') || 'body');
+        if (customContainer) {
+            targetContainer = customContainer;
+        }
         
-        const time = logEvent('MockSandboxCreated', 'info', 'Created mock sandbox element');
-        updateStatus(indicators.sandboxElement, 'info', `Created mock (${time.toFixed(0)}ms)`);
+        // Add to container
+        targetContainer.appendChild(mockElement);
         
-        // Update sandbox display
-        updateSandboxDisplay(mockSandbox);
+        const time = logEvent('MockElementCreated', 'info', 'Created mock element');
+        updateStatus(indicators.targetElement, 'info', `Created mock (${time.toFixed(0)}ms)`);
+        
+        // Update element display
+        updateElementDisplay(mockElement);
     }
     
-    // Update sandbox display
-    function updateSandboxDisplay(element) {
+    // Update element display
+    function updateElementDisplay(element) {
         const previousDisplay = element.style.display;
         element.style.display = 'block';
         
-        const isMock = element.classList.contains('mock-sandbox');
+        const isMock = element.classList.contains('mock-element');
         
         // Position the mock element in a visible area
         if (isMock) {
@@ -419,7 +466,7 @@
             });
         }
         
-        const time = logEvent('SandboxDisplayUpdated', 'success', 'Set sandbox display to block', {
+        const time = logEvent('ElementDisplayUpdated', 'success', 'Set element display to block', {
             from: previousDisplay || '(not set)',
             to: 'block',
             isMock
@@ -432,13 +479,13 @@
             
             if (isVisible) {
                 updateStatus(
-                    indicators.sandboxDisplayed, 
+                    indicators.elementDisplayed, 
                     'success', 
                     `Displayed${isMock ? ' (mock)' : ''} (${time.toFixed(0)}ms)`
                 );
             } else {
                 updateStatus(
-                    indicators.sandboxDisplayed, 
+                    indicators.elementDisplayed, 
                     'warning', 
                     `Set to block but still hidden (${time.toFixed(0)}ms)`,
                     { computedDisplay }
@@ -453,9 +500,20 @@
             timing: timing.events,
             userAgent: navigator.userAgent,
             url: window.location.href,
+            config: config,
             timestamp: new Date().toISOString()
         };
     };
     
-    console.log('%c[PostHogDebugger] Initialized: View debug data with window.PostHogDebugger.timing', 'color: #2196F3; font-weight: bold');
+    // Toggle debugger visibility
+    window.PostHogDebugger.toggleVisibility = () => {
+        if (debugContainer.style.display === 'none') {
+            debugContainer.style.display = 'block';
+        } else {
+            debugContainer.style.display = 'none';
+        }
+    };
+    
+    console.log('%c[PostHogDebugger] Initialized with config:', 'color: #2196F3; font-weight: bold', config);
+    console.log('%c[PostHogDebugger] View debug data with window.PostHogDebugger.timing or toggle visibility with window.PostHogDebugger.toggleVisibility()', 'color: #2196F3;');
 })();
