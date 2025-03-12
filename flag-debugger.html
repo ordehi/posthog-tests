@@ -32,11 +32,12 @@
             
             <div class="mock-area" id="mock-area">
                 <h3>Test Area</h3>
-                <p>This area contains a <code>.homepage-sandbox</code> element that will be shown when the feature flag is enabled.</p>
+                <p>This area contains a target container where the debugger can insert content when flags match.</p>
                 
-                <div class="homepage-sandbox">
+                <!-- This content will be hidden by default and only shown when the flag matches -->
+                <div class="homepage-sandbox" style="display: none;">
                     <h4>Sandbox Content</h4>
-                    <p>This content should only be visible when the PostHog feature flag <code>sandbox_embed</code> is set to <code>with-sandbox</code>.</p>
+                    <p>This content will only be visible when the PostHog feature flag <code>sandbox_embed</code> is set to <code>with-sandbox</code>.</p>
                 </div>
             </div>
             
@@ -200,12 +201,22 @@ window.PostHogDebugger.toggleVisibility()</pre>
         // Mock PostHog for demonstration
         let mockPostHogInitialized = false;
         let flagEnabled = false;
+        let flagName = '';
+        let flagValue = '';
 
         // Initialize mock PostHog
         function initMockPostHog() {
+            // Get values from the form
+            flagName = document.getElementById('flag-name').value;
+            flagValue = document.getElementById('flag-value').value;
+            
             window.posthog = {
                 onFeatureFlags: function(callback) {
                     console.log("Mock PostHog: onFeatureFlags called");
+                    
+                    // Store callback for future use
+                    window.posthog._callbacks = window.posthog._callbacks || [];
+                    window.posthog._callbacks.push(callback);
                     
                     // Simulate random delay to help demonstrate race conditions
                     const delay = Math.floor(Math.random() * 500) + 100;
@@ -217,20 +228,21 @@ window.PostHogDebugger.toggleVisibility()</pre>
                         if (callback) callback();
                     }, delay);
                 },
-                getFeatureFlag: function(flagName) {
-                    console.log(`Mock PostHog: getFeatureFlag called for '${flagName}'`);
-                    if (flagName === 'sandbox_embed') {
-                        return flagEnabled ? 'with-sandbox' : 'disabled';
+                getFeatureFlag: function(requestedFlagName) {
+                    console.log(`Mock PostHog: getFeatureFlag called for '${requestedFlagName}'`);
+                    if (requestedFlagName === flagName) {
+                        return flagEnabled ? flagValue : 'disabled';
                     }
                     return null;
                 },
                 featureFlags: {
                     flagsLoaded: false
-                }
+                },
+                _callbacks: []
             };
             
             mockPostHogInitialized = true;
-            console.log("Mock PostHog: Initialized");
+            console.log(`Mock PostHog: Initialized with flag name: ${flagName}, possible values: ${flagValue} or 'disabled'`);
         }
 
         // Toggle the feature flag value
@@ -241,7 +253,22 @@ window.PostHogDebugger.toggleVisibility()</pre>
             }
             
             flagEnabled = !flagEnabled;
-            console.log(`Mock PostHog: Feature flag 'sandbox_embed' set to ${flagEnabled ? "'with-sandbox'" : "'disabled'"}`);
+            const currentValue = flagEnabled ? flagValue : 'disabled'; 
+            console.log(`Mock PostHog: Feature flag '${flagName}' set to '${currentValue}'`);
+            
+            // If debugger is initialized, trigger all callbacks to simulate flag change
+            if (window.posthog && window.posthog._callbacks) {
+                console.log("Mock PostHog: Re-running callbacks to notify of flag change");
+                window.posthog._callbacks.forEach(callback => {
+                    try {
+                        callback();
+                    } catch (e) {
+                        console.error("Error in callback:", e);
+                    }
+                });
+            }
+            
+            return currentValue;
         }
 
         // Generate URL from form values

@@ -22,6 +22,14 @@
     if (window.PostHogDebugger.initialized) return;
     window.PostHogDebugger.initialized = true;
     
+    // First, hide all elements matching our target selector until we've checked the flags
+    const initialElements = document.querySelectorAll(urlParams.get('selector') || '.homepage-sandbox');
+    if (initialElements.length > 0) {
+        initialElements.forEach(el => {
+            el.style.display = 'none';
+        });
+    }
+    
     // Store configuration
     window.PostHogDebugger.config = config;
     
@@ -347,6 +355,9 @@
                 // Skip element check since flag is not found
                 updateStatus(indicators.targetElement, 'info', 'Skipped (flag not found)');
                 updateStatus(indicators.elementDisplayed, 'info', 'Skipped (flag not found)');
+                
+                // Ensure any existing elements matching the selector are hidden
+                hideTargetElements();
                 return;
             } else if (flagValue === config.flagValue) {
                 const time = logEvent('FlagCheck', 'success', `Flag is set to ${config.flagValue}`, { value: flagValue });
@@ -362,6 +373,9 @@
                 logEvent('ElementSkipped', 'info', `Skipping element display (flag value '${flagValue}' != '${config.flagValue}')`);
                 updateStatus(indicators.targetElement, 'info', `Skipped (unexpected flag value '${flagValue}')`);
                 updateStatus(indicators.elementDisplayed, 'info', `Skipped (unexpected flag value '${flagValue}')`);
+                
+                // Ensure any existing elements matching the selector are hidden
+                hideTargetElements();
                 return;
             }
         } catch (error) {
@@ -371,6 +385,20 @@
             // Skip element checks on error
             updateStatus(indicators.targetElement, 'error', 'Skipped (flag error)');
             updateStatus(indicators.elementDisplayed, 'error', 'Skipped (flag error)');
+            
+            // Ensure any existing elements matching the selector are hidden
+            hideTargetElements();
+        }
+    }
+    
+    // Hide any elements matching the target selector
+    function hideTargetElements() {
+        const elements = document.querySelectorAll(config.selector);
+        if (elements.length > 0) {
+            logEvent('ElementsHidden', 'info', `Hiding ${elements.length} elements matching ${config.selector}`);
+            elements.forEach(el => {
+                el.style.display = 'none';
+            });
         }
     }
     
@@ -401,7 +429,7 @@
         updateElementDisplay(targetElement);
     }
     
-    // Create mock element if needed
+                // Create mock element if needed
     function createMockElement() {
         // Double-check flag value before creating mock
         const flagValue = window.posthog.getFeatureFlag(config.flagName);
