@@ -8,221 +8,70 @@
     <script src="posthog.js"></script>
 </head>
 <body>
-    <div class="container">
+    <header>
         <h1>PostHog SQL Client</h1>
-        
-        <div class="input-row">
+        <p class="subtitle">Run SQL queries against your PostHog instance</p>
+    </header>
+
+    <nav>
+        <ul>
+            <li><a href="index.html">Home</a></li>
+            <li><a href="feature-flag-debugger.html">Feature Flag Debugger</a></li>
+            <li><a href="sql-client.html" class="active">SQL Client</a></li>
+            <!-- Add new pages here as they become available -->
+        </ul>
+    </nav>
+
+    <main>
+        <div class="container">
+            <div class="input-row">
+                <div class="form-group">
+                    <label for="host">Host</label>
+                    <select id="host">
+                        <option value="https://us.posthog.com">US Cloud (us.posthog.com)</option>
+                        <option value="https://eu.posthog.com">EU Cloud (eu.posthog.com)</option>
+                        <option value="custom">Custom Host</option>
+                    </select>
+                </div>
+                <div class="form-group" id="custom-host-container" style="display: none;">
+                    <label for="custom-host">Custom Host URL</label>
+                    <input type="text" id="custom-host" placeholder="https://your-posthog-instance.com">
+                </div>
+            </div>
+
+            <div class="input-row">
+                <div class="form-group">
+                    <label for="project-id">Project ID</label>
+                    <input type="text" id="project-id" placeholder="your_project_id">
+                </div>
+                <div class="form-group">
+                    <label for="api-key">Personal API Key</label>
+                    <input type="text" id="api-key" placeholder="your_personal_api_key">
+                </div>
+            </div>
+
             <div class="form-group">
-                <label for="host">Host</label>
-                <select id="host">
-                    <option value="https://us.posthog.com">US Cloud (us.posthog.com)</option>
-                    <option value="https://eu.posthog.com">EU Cloud (eu.posthog.com)</option>
-                    <option value="custom">Custom Host</option>
-                </select>
+                <label for="query">SQL Query</label>
+                <textarea id="query" placeholder="Example: SELECT properties FROM events WHERE timestamp > toDateTime('2025-02-26T14:05:00.000000Z') and timestamp <= toDateTime('2025-02-26T20:05:00.000000Z')">SELECT properties FROM events WHERE timestamp > toDateTime('2025-02-26T14:05:00.000000Z') and timestamp <= toDateTime('2025-02-26T20:05:00.000000Z')</textarea>
             </div>
-            <div class="form-group" id="custom-host-container" style="display: none;">
-                <label for="custom-host">Custom Host URL</label>
-                <input type="text" id="custom-host" placeholder="https://your-posthog-instance.com">
-            </div>
-        </div>
 
-        <div class="input-row">
-            <div class="form-group">
-                <label for="project-id">Project ID</label>
-                <input type="text" id="project-id" placeholder="your_project_id">
+            <div class="button-container">
+                <button id="fetch-button" class="btn accent">Run Query</button>
+                <div class="loader" id="loader"></div>
+                <span class="status" id="status"></span>
             </div>
-            <div class="form-group">
-                <label for="api-key">Personal API Key</label>
-                <input type="text" id="api-key" placeholder="your_personal_api_key">
+
+            <div class="output-container">
+                <button class="copy-button" id="copy-button" style="display: none;">Copy</button>
+                <div id="output" class="output-placeholder">Query results will appear here</div>
             </div>
         </div>
+    </main>
 
-        <div class="form-group">
-            <label for="query">SQL Query</label>
-            <textarea id="query" placeholder="Example: SELECT properties FROM events WHERE timestamp > toDateTime('2025-02-26T14:05:00.000000Z') and timestamp <= toDateTime('2025-02-26T20:05:00.000000Z')">SELECT properties FROM events WHERE timestamp > toDateTime('2025-02-26T14:05:00.000000Z') and timestamp <= toDateTime('2025-02-26T20:05:00.000000Z')</textarea>
-        </div>
+    <footer>
+        <p>PostHog Tools Hub | For demonstration and debugging purposes only</p>
+    </footer>
 
-        <div class="button-container">
-            <button id="fetch-button">Run Query</button>
-            <div class="loader" id="loader"></div>
-            <span class="status" id="status"></span>
-        </div>
-
-        <div class="output-container">
-            <button class="copy-button" id="copy-button" style="display: none;">Copy</button>
-            <div id="output" class="output-placeholder">Query results will appear here</div>
-        </div>
-    </div>
-
-    <script>
-        // DOM elements
-        const hostSelect = document.getElementById('host');
-        const customHostContainer = document.getElementById('custom-host-container');
-        const customHostInput = document.getElementById('custom-host');
-        const projectIdInput = document.getElementById('project-id');
-        const apiKeyInput = document.getElementById('api-key');
-        const queryInput = document.getElementById('query');
-        const fetchButton = document.getElementById('fetch-button');
-        const outputDiv = document.getElementById('output');
-        const loader = document.getElementById('loader');
-        const statusSpan = document.getElementById('status');
-        const copyButton = document.getElementById('copy-button');
-
-        // Handle custom host selection
-        hostSelect.addEventListener('change', function() {
-            customHostContainer.style.display = this.value === 'custom' ? 'block' : 'none';
-        });
-
-        // Fetch data from PostHog API
-        fetchButton.addEventListener('click', async function() {
-            let host;
-            if (hostSelect.value === 'custom') {
-                host = customHostInput.value.trim();
-                if (!host) {
-                    showError('Please enter a custom host URL');
-                    return;
-                }
-                // Remove trailing slash if present
-                if (host.endsWith('/')) {
-                    host = host.slice(0, -1);
-                }
-            } else {
-                host = hostSelect.value;
-            }
-
-            const projectId = projectIdInput.value.trim();
-            const apiKey = apiKeyInput.value.trim();
-            const query = queryInput.value.trim();
-
-            // Validate inputs
-            if (!projectId) {
-                showError('Project ID is required');
-                return;
-            }
-            if (!apiKey) {
-                showError('API Key is required');
-                return;
-            }
-            if (!query) {
-                showError('SQL Query is required');
-                return;
-            }
-
-            // Show loading state
-            fetchButton.disabled = true;
-            loader.style.display = 'inline-block';
-            statusSpan.textContent = 'Running query...';
-            statusSpan.className = 'status';
-            outputDiv.innerHTML = '<div class="output-placeholder">Fetching results...</div>';
-            copyButton.style.display = 'none';
-
-            try {
-                const response = await fetch(`${host}/api/projects/${projectId}/query`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${apiKey}`
-                    },
-                    body: JSON.stringify({
-                        query: {
-                            kind: "HogQLQuery",
-                            query: query
-                        }
-                    })
-                });
-
-                const data = await response.json();
-                
-                if (!response.ok) {
-                    let errorMessage = 'An error occurred';
-                    if (data && data.detail) {
-                        errorMessage = `Error: ${data.detail}`;
-                    } else if (data && data.error) {
-                        errorMessage = `Error: ${data.error}`;
-                    }
-                    showError(errorMessage);
-                    return;
-                }
-
-                // Format and display the results
-                const formattedOutput = JSON.stringify(data, null, 2);
-                outputDiv.innerHTML = `<pre>${formattedOutput}</pre>`;
-                statusSpan.textContent = 'Query completed successfully';
-                copyButton.style.display = 'block';
-            } catch (error) {
-                showError(`Network error: ${error.message}`);
-            } finally {
-                // Reset UI state
-                fetchButton.disabled = false;
-                loader.style.display = 'none';
-            }
-        });
-
-        // Copy results to clipboard
-        copyButton.addEventListener('click', function() {
-            const preElement = outputDiv.querySelector('pre');
-            if (preElement) {
-                const text = preElement.textContent;
-                navigator.clipboard.writeText(text).then(() => {
-                    const originalText = copyButton.textContent;
-                    copyButton.textContent = 'Copied!';
-                    setTimeout(() => {
-                        copyButton.textContent = originalText;
-                    }, 2000);
-                }).catch(err => {
-                    console.error('Failed to copy text: ', err);
-                });
-            }
-        });
-
-        // Show error message
-        function showError(message) {
-            statusSpan.textContent = message;
-            statusSpan.className = 'status error';
-            outputDiv.innerHTML = '<div class="output-placeholder">An error occurred. Please check your inputs and try again.</div>';
-        }
-
-        // Load any saved values from localStorage
-        window.addEventListener('DOMContentLoaded', function() {
-            const savedHost = localStorage.getItem('posthog_host');
-            const savedProjectId = localStorage.getItem('posthog_project_id');
-            const savedApiKey = localStorage.getItem('posthog_api_key');
-            const savedQuery = localStorage.getItem('posthog_query');
-
-            if (savedHost) {
-                if (savedHost === 'https://us.posthog.com' || savedHost === 'https://eu.posthog.com') {
-                    hostSelect.value = savedHost;
-                } else {
-                    hostSelect.value = 'custom';
-                    customHostContainer.style.display = 'block';
-                    customHostInput.value = savedHost;
-                }
-            }
-            
-            if (savedProjectId) projectIdInput.value = savedProjectId;
-            if (savedApiKey) apiKeyInput.value = savedApiKey;
-            if (savedQuery) queryInput.value = savedQuery;
-        });
-
-        // Save values to localStorage when input changes
-        [hostSelect, customHostInput, projectIdInput, apiKeyInput, queryInput].forEach(input => {
-            input.addEventListener('change', saveInputValues);
-            input.addEventListener('input', saveInputValues);
-        });
-
-        function saveInputValues() {
-            let hostValue;
-            if (hostSelect.value === 'custom') {
-                hostValue = customHostInput.value.trim();
-            } else {
-                hostValue = hostSelect.value;
-            }
-            
-            localStorage.setItem('posthog_host', hostValue);
-            localStorage.setItem('posthog_project_id', projectIdInput.value.trim());
-            localStorage.setItem('posthog_api_key', apiKeyInput.value.trim());
-            localStorage.setItem('posthog_query', queryInput.value.trim());
-        }
-    </script>
+    <script src="sqlClient.js"></script>
 </body>
 </html>
