@@ -51,7 +51,7 @@
         color: 'white',
         boxShadow: '0 2px 10px rgba(0, 0, 0, 0.3)',
         maxWidth: '400px',
-        maxHeight: '300px',
+        maxHeight: '80vh',
         overflowY: 'auto',
         transition: 'all 0.3s ease',
         opacity: '0.9',
@@ -110,6 +110,66 @@
         elementDisplayed: createIndicator('Element Displayed')
     };
     
+    // Create configuration form
+    const configForm = document.createElement('div');
+    configForm.style.borderTop = '1px solid rgba(255, 255, 255, 0.2)';
+    configForm.style.marginTop = '10px';
+    configForm.style.paddingTop = '10px';
+    configForm.style.display = 'none'; // Initially hidden
+    
+    configForm.innerHTML = `
+        <div style="margin-bottom: 8px; font-weight: bold;">Debugger Configuration</div>
+        
+        <div style="margin-bottom: 6px;">
+            <label style="display: block; margin-bottom: 3px; font-size: 11px;">Flag Name:</label>
+            <input type="text" id="ph-debug-flag-name" value="${config.flagName}" 
+                style="width: 100%; background: #333; color: white; border: 1px solid #555; 
+                padding: 4px; border-radius: 3px; font-size: 11px;">
+        </div>
+        
+        <div style="margin-bottom: 6px;">
+            <label style="display: block; margin-bottom: 3px; font-size: 11px;">Expected Value:</label>
+            <input type="text" id="ph-debug-flag-value" value="${config.flagValue}" 
+                style="width: 100%; background: #333; color: white; border: 1px solid #555; 
+                padding: 4px; border-radius: 3px; font-size: 11px;">
+        </div>
+        
+        <div style="margin-bottom: 6px;">
+            <label style="display: block; margin-bottom: 3px; font-size: 11px;">Selector:</label>
+            <input type="text" id="ph-debug-selector" value="${config.selector}" 
+                style="width: 100%; background: #333; color: white; border: 1px solid #555; 
+                padding: 4px; border-radius: 3px; font-size: 11px;">
+        </div>
+        
+        <div style="margin-bottom: 6px;">
+            <label style="display: block; margin-bottom: 3px; font-size: 11px;">Display Mode:</label>
+            <select id="ph-debug-mode" 
+                style="width: 100%; background: #333; color: white; border: 1px solid #555; 
+                padding: 4px; border-radius: 3px; font-size: 11px;">
+                <option value="console" ${config.displayMode === 'console' ? 'selected' : ''}>Console Only</option>
+                <option value="window" ${config.displayMode === 'window' ? 'selected' : ''}>Console + Visual</option>
+            </select>
+        </div>
+        
+        <div style="display: flex; gap: 5px; margin-top: 10px;">
+            <button id="ph-debug-generate-url" 
+                style="flex: 1; background: #4CAF50; color: white; border: none; 
+                padding: 5px; border-radius: 3px; cursor: pointer; font-size: 11px;">
+                Generate URL
+            </button>
+            <button id="ph-debug-copy-url" 
+                style="flex: 1; background: #2196F3; color: white; border: none; 
+                padding: 5px; border-radius: 3px; cursor: pointer; font-size: 11px;">
+                Copy URL
+            </button>
+        </div>
+        
+        <div id="ph-debug-url-preview" 
+            style="margin-top: 8px; font-size: 10px; word-break: break-all; 
+            background: #222; padding: 5px; border-radius: 3px; max-height: 60px; overflow-y: auto;">
+        </div>
+    `;
+    
     // Add indicators to container
     Object.values(indicators).forEach(indicator => {
         debugContainer.appendChild(indicator.container);
@@ -131,6 +191,9 @@
     `;
     debugContainer.appendChild(configDisplay);
     
+    // Add configuration form to container
+    debugContainer.appendChild(configForm);
+    
     // Add expand/collapse button
     const toggleButton = document.createElement('button');
     toggleButton.textContent = 'Minimize';
@@ -142,26 +205,32 @@
         borderRadius: '4px',
         marginTop: '5px',
         cursor: 'pointer',
-        width: '100%'
+        width: '48%',
+        fontSize: '11px'
     });
     
-    let minimized = false;
-    toggleButton.addEventListener('click', () => {
-        minimized = !minimized;
-        if (minimized) {
-            Object.values(indicators).forEach(ind => ind.container.style.display = 'none');
-            configDisplay.style.display = 'none';
-            toggleButton.textContent = 'Expand';
-            debugContainer.style.padding = '5px';
-        } else {
-            Object.values(indicators).forEach(ind => ind.container.style.display = 'flex');
-            configDisplay.style.display = 'block';
-            toggleButton.textContent = 'Minimize';
-            debugContainer.style.padding = '10px';
-        }
+    // Add configure button
+    const configButton = document.createElement('button');
+    configButton.textContent = 'Configure';
+    Object.assign(configButton.style, {
+        background: '#2196F3',
+        border: 'none',
+        color: 'white',
+        padding: '5px 10px',
+        borderRadius: '4px',
+        marginTop: '5px',
+        cursor: 'pointer',
+        width: '48%',
+        marginLeft: '4%',
+        fontSize: '11px'
     });
     
-    debugContainer.appendChild(toggleButton);
+    // Button container
+    const buttonContainer = document.createElement('div');
+    buttonContainer.style.display = 'flex';
+    buttonContainer.appendChild(toggleButton);
+    buttonContainer.appendChild(configButton);
+    debugContainer.appendChild(buttonContainer);
     
     // Add close button
     const closeButton = document.createElement('button');
@@ -193,9 +262,102 @@
     const addContainerToDocument = () => {
         if (document.body) {
             document.body.appendChild(debugContainer);
+            
+            // Setup event listeners for the configuration form
+            setupConfigFormListeners();
         } else {
             // If body doesn't exist yet, retry in a moment
             setTimeout(addContainerToDocument, 10);
+        }
+    };
+    
+    // Setup event handlers for the configuration form
+    const setupConfigFormListeners = () => {
+        // Toggle minimize/expand
+        let minimized = false;
+        toggleButton.addEventListener('click', () => {
+            minimized = !minimized;
+            if (minimized) {
+                Object.values(indicators).forEach(ind => ind.container.style.display = 'none');
+                configDisplay.style.display = 'none';
+                configForm.style.display = 'none';
+                toggleButton.textContent = 'Expand';
+                debugContainer.style.padding = '5px';
+            } else {
+                Object.values(indicators).forEach(ind => ind.container.style.display = 'flex');
+                configDisplay.style.display = 'block';
+                toggleButton.textContent = 'Minimize';
+                debugContainer.style.padding = '10px';
+            }
+        });
+        
+        // Toggle configuration form
+        let configVisible = false;
+        configButton.addEventListener('click', () => {
+            configVisible = !configVisible;
+            configForm.style.display = configVisible ? 'block' : 'none';
+            configButton.textContent = configVisible ? 'Hide Config' : 'Configure';
+            
+            // If we're showing config, make sure we're expanded
+            if (configVisible && minimized) {
+                minimized = false;
+                Object.values(indicators).forEach(ind => ind.container.style.display = 'flex');
+                configDisplay.style.display = 'block';
+                toggleButton.textContent = 'Minimize';
+                debugContainer.style.padding = '10px';
+            }
+        });
+        
+        // Generate URL button
+        const generateUrlButton = document.getElementById('ph-debug-generate-url');
+        if (generateUrlButton) {
+            generateUrlButton.addEventListener('click', () => {
+                const flagName = document.getElementById('ph-debug-flag-name').value;
+                const flagValue = document.getElementById('ph-debug-flag-value').value;
+                const selector = document.getElementById('ph-debug-selector').value;
+                const displayMode = document.getElementById('ph-debug-mode').value;
+                
+                let url = new URL(window.location.href);
+                url.search = '';
+                url.searchParams.set('debugPHFlags', '');
+                
+                if (flagName) url.searchParams.set('flag_name', flagName);
+                if (flagValue) url.searchParams.set('flag_value', flagValue);
+                if (selector) url.searchParams.set('selector', selector);
+                if (displayMode !== 'console') url.searchParams.set('mode', displayMode);
+                
+                const urlPreview = document.getElementById('ph-debug-url-preview');
+                if (urlPreview) {
+                    urlPreview.textContent = url.toString();
+                }
+            });
+        }
+        
+        // Copy URL button
+        const copyUrlButton = document.getElementById('ph-debug-copy-url');
+        if (copyUrlButton) {
+            copyUrlButton.addEventListener('click', () => {
+                const urlPreview = document.getElementById('ph-debug-url-preview');
+                if (urlPreview && urlPreview.textContent) {
+                    navigator.clipboard.writeText(urlPreview.textContent)
+                        .then(() => {
+                            const originalText = copyUrlButton.textContent;
+                            copyUrlButton.textContent = 'Copied!';
+                            setTimeout(() => {
+                                copyUrlButton.textContent = originalText;
+                            }, 2000);
+                        })
+                        .catch(err => {
+                            console.error('Failed to copy URL:', err);
+                        });
+                }
+            });
+        }
+        
+        // Generate URL on load
+        const generateUrlButton = document.getElementById('ph-debug-generate-url');
+        if (generateUrlButton) {
+            generateUrlButton.click();
         }
     };
     
@@ -540,6 +702,69 @@
         } else {
             debugContainer.style.display = 'none';
         }
+    };
+    
+    // Allow updating configuration
+    window.PostHogDebugger.updateConfig = (newConfig) => {
+        // Update the configuration
+        if (newConfig.flagName) config.flagName = newConfig.flagName;
+        if (newConfig.flagValue) config.flagValue = newConfig.flagValue;
+        if (newConfig.selector) config.selector = newConfig.selector;
+        if (newConfig.displayMode) config.displayMode = newConfig.displayMode;
+        
+        // Update the display
+        configDisplay.innerHTML = `
+            <strong>Configuration:</strong><br>
+            Flag Name: ${config.flagName}<br>
+            Expected Value: ${config.flagValue}<br>
+            Target Selector: ${config.selector}<br>
+            Display Mode: ${config.displayMode}
+        `;
+        
+        // Update form fields
+        const flagNameInput = document.getElementById('ph-debug-flag-name');
+        if (flagNameInput) flagNameInput.value = config.flagName;
+        
+        const flagValueInput = document.getElementById('ph-debug-flag-value');
+        if (flagValueInput) flagValueInput.value = config.flagValue;
+        
+        const selectorInput = document.getElementById('ph-debug-selector');
+        if (selectorInput) selectorInput.value = config.selector;
+        
+        const modeSelect = document.getElementById('ph-debug-mode');
+        if (modeSelect) modeSelect.value = config.displayMode;
+        
+        // Re-check flags with new configuration
+        checkFeatureFlags();
+        
+        return config;
+    };
+    
+    // Apply configuration directly (for use with the mini configurator)
+    window.PostHogDebugger.applyConfig = () => {
+        const flagNameInput = document.getElementById('ph-debug-flag-name');
+        const flagValueInput = document.getElementById('ph-debug-flag-value');
+        const selectorInput = document.getElementById('ph-debug-selector');
+        const modeSelect = document.getElementById('ph-debug-mode');
+        
+        if (flagNameInput && flagValueInput && selectorInput && modeSelect) {
+            const newConfig = {
+                flagName: flagNameInput.value,
+                flagValue: flagValueInput.value,
+                selector: selectorInput.value,
+                displayMode: modeSelect.value
+            };
+            
+            window.PostHogDebugger.updateConfig(newConfig);
+            
+            // Generate updated URL
+            const generateUrlButton = document.getElementById('ph-debug-generate-url');
+            if (generateUrlButton) {
+                generateUrlButton.click();
+            }
+        }
+        
+        return config;
     };
     
     console.log('%c[PostHogDebugger] Initialized with config:', 'color: #2196F3; font-weight: bold', config);
