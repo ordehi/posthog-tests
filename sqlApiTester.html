@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PostHog SQL Client</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f7fa;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+        }
+        h1 {
+            color: #ff5c00;
+            margin-top: 0;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+        input[type="text"], select, textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+            font-family: inherit;
+            font-size: inherit;
+        }
+        .input-row {
+            display: flex;
+            gap: 15px;
+        }
+        .input-row .form-group {
+            flex: 1;
+        }
+        button {
+            background-color: #ff5c00;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 500;
+            transition: background-color 0.2s;
+        }
+        button:hover {
+            background-color: #e05100;
+        }
+        button:disabled {
+            background-color: #ffab80;
+            cursor: not-allowed;
+        }
+        textarea {
+            min-height: 140px;
+            font-family: monospace;
+            resize: vertical;
+        }
+        .output-container {
+            margin-top: 20px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 15px;
+            background-color: #f8f9fa;
+            min-height: 200px;
+            max-height: 400px;
+            overflow: auto;
+            position: relative;
+        }
+        .output-placeholder {
+            color: #999;
+            font-style: italic;
+        }
+        pre {
+            margin: 0;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+        .loader {
+            display: none;
+            border: 3px solid #f3f3f3;
+            border-radius: 50%;
+            border-top: 3px solid #ff5c00;
+            width: 20px;
+            height: 20px;
+            animation: spin 1s linear infinite;
+            margin-left: 10px;
+            vertical-align: middle;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .button-container {
+            display: flex;
+            align-items: center;
+        }
+        .copy-button {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background-color: #eee;
+            color: #333;
+            border: none;
+            border-radius: 4px;
+            padding: 5px 10px;
+            font-size: 12px;
+            cursor: pointer;
+        }
+        .copy-button:hover {
+            background-color: #ddd;
+        }
+        .status {
+            margin-left: 15px;
+            color: #666;
+        }
+        .error {
+            color: #e74c3c;
+            font-weight: bold;
+        }
+    </style>
+    <script src="posthog.js"></script>
+</head>
+<body>
+    <div class="container">
+        <h1>PostHog SQL Client</h1>
+        
+        <div class="input-row">
+            <div class="form-group">
+                <label for="host">Host</label>
+                <select id="host">
+                    <option value="https://us.posthog.com">US Cloud (us.posthog.com)</option>
+                    <option value="https://eu.posthog.com">EU Cloud (eu.posthog.com)</option>
+                    <option value="custom">Custom Host</option>
+                </select>
+            </div>
+            <div class="form-group" id="custom-host-container" style="display: none;">
+                <label for="custom-host">Custom Host URL</label>
+                <input type="text" id="custom-host" placeholder="https://your-posthog-instance.com">
+            </div>
+        </div>
+
+        <div class="input-row">
+            <div class="form-group">
+                <label for="project-id">Project ID</label>
+                <input type="text" id="project-id" placeholder="your_project_id">
+            </div>
+            <div class="form-group">
+                <label for="api-key">Personal API Key</label>
+                <input type="text" id="api-key" placeholder="your_personal_api_key">
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="query">SQL Query</label>
+            <textarea id="query" placeholder="Example: SELECT properties FROM events WHERE timestamp > toDateTime('2025-02-26T14:05:00.000000Z') and timestamp <= toDateTime('2025-02-26T20:05:00.000000Z')">SELECT properties FROM events WHERE timestamp > toDateTime('2025-02-26T14:05:00.000000Z') and timestamp <= toDateTime('2025-02-26T20:05:00.000000Z')</textarea>
+        </div>
+
+        <div class="button-container">
+            <button id="fetch-button">Run Query</button>
+            <div class="loader" id="loader"></div>
+            <span class="status" id="status"></span>
+        </div>
+
+        <div class="output-container">
+            <button class="copy-button" id="copy-button" style="display: none;">Copy</button>
+            <div id="output" class="output-placeholder">Query results will appear here</div>
+        </div>
+    </div>
+
+    <script>
+        // DOM elements
+        const hostSelect = document.getElementById('host');
+        const customHostContainer = document.getElementById('custom-host-container');
+        const customHostInput = document.getElementById('custom-host');
+        const projectIdInput = document.getElementById('project-id');
+        const apiKeyInput = document.getElementById('api-key');
+        const queryInput = document.getElementById('query');
+        const fetchButton = document.getElementById('fetch-button');
+        const outputDiv = document.getElementById('output');
+        const loader = document.getElementById('loader');
+        const statusSpan = document.getElementById('status');
+        const copyButton = document.getElementById('copy-button');
+
+        // Handle custom host selection
+        hostSelect.addEventListener('change', function() {
+            customHostContainer.style.display = this.value === 'custom' ? 'block' : 'none';
+        });
+
+        // Fetch data from PostHog API
+        fetchButton.addEventListener('click', async function() {
+            let host;
+            if (hostSelect.value === 'custom') {
+                host = customHostInput.value.trim();
+                if (!host) {
+                    showError('Please enter a custom host URL');
+                    return;
+                }
+                // Remove trailing slash if present
+                if (host.endsWith('/')) {
+                    host = host.slice(0, -1);
+                }
+            } else {
+                host = hostSelect.value;
+            }
+
+            const projectId = projectIdInput.value.trim();
+            const apiKey = apiKeyInput.value.trim();
+            const query = queryInput.value.trim();
+
+            // Validate inputs
+            if (!projectId) {
+                showError('Project ID is required');
+                return;
+            }
+            if (!apiKey) {
+                showError('API Key is required');
+                return;
+            }
+            if (!query) {
+                showError('SQL Query is required');
+                return;
+            }
+
+            // Show loading state
+            fetchButton.disabled = true;
+            loader.style.display = 'inline-block';
+            statusSpan.textContent = 'Running query...';
+            statusSpan.className = 'status';
+            outputDiv.innerHTML = '<div class="output-placeholder">Fetching results...</div>';
+            copyButton.style.display = 'none';
+
+            try {
+                const response = await fetch(`${host}/api/projects/${projectId}/query`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${apiKey}`
+                    },
+                    body: JSON.stringify({
+                        query: {
+                            kind: "HogQLQuery",
+                            query: query
+                        }
+                    })
+                });
+
+                const data = await response.json();
+                
+                if (!response.ok) {
+                    let errorMessage = 'An error occurred';
+                    if (data && data.detail) {
+                        errorMessage = `Error: ${data.detail}`;
+                    } else if (data && data.error) {
+                        errorMessage = `Error: ${data.error}`;
+                    }
+                    showError(errorMessage);
+                    return;
+                }
+
+                // Format and display the results
+                const formattedOutput = JSON.stringify(data, null, 2);
+                outputDiv.innerHTML = `<pre>${formattedOutput}</pre>`;
+                statusSpan.textContent = 'Query completed successfully';
+                copyButton.style.display = 'block';
+            } catch (error) {
+                showError(`Network error: ${error.message}`);
+            } finally {
+                // Reset UI state
+                fetchButton.disabled = false;
+                loader.style.display = 'none';
+            }
+        });
+
+        // Copy results to clipboard
+        copyButton.addEventListener('click', function() {
+            const preElement = outputDiv.querySelector('pre');
+            if (preElement) {
+                const text = preElement.textContent;
+                navigator.clipboard.writeText(text).then(() => {
+                    const originalText = copyButton.textContent;
+                    copyButton.textContent = 'Copied!';
+                    setTimeout(() => {
+                        copyButton.textContent = originalText;
+                    }, 2000);
+                }).catch(err => {
+                    console.error('Failed to copy text: ', err);
+                });
+            }
+        });
+
+        // Show error message
+        function showError(message) {
+            statusSpan.textContent = message;
+            statusSpan.className = 'status error';
+            outputDiv.innerHTML = '<div class="output-placeholder">An error occurred. Please check your inputs and try again.</div>';
+        }
+
+        // Load any saved values from localStorage
+        window.addEventListener('DOMContentLoaded', function() {
+            const savedHost = localStorage.getItem('posthog_host');
+            const savedProjectId = localStorage.getItem('posthog_project_id');
+            const savedApiKey = localStorage.getItem('posthog_api_key');
+            const savedQuery = localStorage.getItem('posthog_query');
+
+            if (savedHost) {
+                if (savedHost === 'https://us.posthog.com' || savedHost === 'https://eu.posthog.com') {
+                    hostSelect.value = savedHost;
+                } else {
+                    hostSelect.value = 'custom';
+                    customHostContainer.style.display = 'block';
+                    customHostInput.value = savedHost;
+                }
+            }
+            
+            if (savedProjectId) projectIdInput.value = savedProjectId;
+            if (savedApiKey) apiKeyInput.value = savedApiKey;
+            if (savedQuery) queryInput.value = savedQuery;
+        });
+
+        // Save values to localStorage when input changes
+        [hostSelect, customHostInput, projectIdInput, apiKeyInput, queryInput].forEach(input => {
+            input.addEventListener('change', saveInputValues);
+            input.addEventListener('input', saveInputValues);
+        });
+
+        function saveInputValues() {
+            let hostValue;
+            if (hostSelect.value === 'custom') {
+                hostValue = customHostInput.value.trim();
+            } else {
+                hostValue = hostSelect.value;
+            }
+            
+            localStorage.setItem('posthog_host', hostValue);
+            localStorage.setItem('posthog_project_id', projectIdInput.value.trim());
+            localStorage.setItem('posthog_api_key', apiKeyInput.value.trim());
+            localStorage.setItem('posthog_query', queryInput.value.trim());
+        }
+    </script>
+</body>
+</html>
