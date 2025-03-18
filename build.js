@@ -4,7 +4,7 @@ const path = require('path');
 
 const config = {
     srcDir: 'src',
-    outputDir: '.',
+    outputDir: 'dist',  // Changed to dist for temporary build
     templatesDir: 'templates',
     pagesDir: 'src/pages'
 };
@@ -132,14 +132,19 @@ async function buildPages() {
 // Copy static assets
 function copyStaticAssets() {
     // Copy CSS files
-    copyFileOrDir('src/styles', 'styles');
+    copyFileOrDir('src/styles', path.join(config.outputDir, 'styles'));
     // Copy JavaScript files
-    copyFileOrDir('src/scripts', 'scripts');
+    copyFileOrDir('src/scripts', path.join(config.outputDir, 'scripts'));
 }
 
 // Main build function
 async function build() {
     try {
+        // Clean dist directory before building
+        if (fs.existsSync(config.outputDir)) {
+            fs.rmSync(config.outputDir, { recursive: true });
+        }
+
         // Ensure output directory exists
         ensureDir(config.outputDir);
 
@@ -147,20 +152,10 @@ async function build() {
         copyStaticAssets();
 
         // Build all pages
-        const pagesDir = path.join(config.pagesDir, 'html');
-        const files = fs.readdirSync(pagesDir);
+        await buildPages();
 
-        for (const file of files) {
-            if (file.endsWith('.ejs')) {
-                const pageName = path.basename(file, '.ejs');
-                const outputPath = path.join(config.outputDir, `${pageName}.html`);
-                await buildPage(pageName, outputPath);
-                console.log(`Built: ${file} → ${outputPath}`);
-            }
-        }
-
-        // Create .nojekyll file in root
-        fs.writeFileSync('.nojekyll', '');
+        // Create .nojekyll file in dist
+        fs.writeFileSync(path.join(config.outputDir, '.nojekyll'), '');
         console.log('Build completed successfully!');
     } catch (error) {
         console.error('Build failed:', error);
