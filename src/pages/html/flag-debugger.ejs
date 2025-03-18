@@ -13,69 +13,242 @@
     <div id="debugger-config" class="tab-content active">
         <p>Use this tool to generate a URL with the right parameters for the feature flag debugger.</p>
         
-        <div class="form-group">
-            <label for="flag-key">Feature Flag Key</label>
-            <input type="text" id="flag-key" placeholder="my-feature-flag">
+        <div class="info-box">
+            <strong>How it works:</strong> The debugger script only activates when the <code>?debugPHFlags</code> parameter is present in the URL. You can configure the debugger with additional parameters to check specific flags, target elements, and control its behavior.
         </div>
         
-        <div class="form-group">
-            <label for="flag-value">Expected Value</label>
-            <input type="text" id="flag-value" placeholder="true">
+        <div class="mock-area" id="mock-area">
+            <h3>Test Area</h3>
+            <p>This area contains a target container where the debugger can insert content when flags match.</p>
+            
+            <!-- This content will be hidden by default and only shown when the flag matches -->
+            <div class="homepage-sandbox" style="display: none;">
+                <h4>Sandbox Content</h4>
+                <p>This content will only be visible when the PostHog feature flag <code>sandbox_embed</code> is set to <code>with-sandbox</code>.</p>
+            </div>
         </div>
         
-        <div class="form-group">
-            <label for="distinct-id">Distinct ID</label>
-            <input type="text" id="distinct-id" placeholder="user-123">
-        </div>
-        
-        <div class="form-group">
-            <label for="groups">Groups (JSON)</label>
-            <textarea id="groups" placeholder='{"company": "acme"}'></textarea>
-        </div>
-        
-        <div class="form-group">
-            <label for="person-properties">Person Properties (JSON)</label>
-            <textarea id="person-properties" placeholder='{"plan": "premium"}'></textarea>
-        </div>
-        
-        <div class="form-group">
-            <label for="group-properties">Group Properties (JSON)</label>
-            <textarea id="group-properties" placeholder='{"company_size": 100}'></textarea>
-        </div>
-        
-        <div class="button-container">
+        <div class="param-form">
+            <h3>Configure Debugger Parameters</h3>
+            
+            <div class="form-group">
+                <label for="flag-name">Flag Name:</label>
+                <input type="text" id="flag-name" value="sandbox_embed" placeholder="Enter feature flag name">
+            </div>
+            
+            <div class="form-group">
+                <label for="flag-value">Expected Flag Value:</label>
+                <input type="text" id="flag-value" value="with-sandbox" placeholder="Enter expected value">
+            </div>
+            
+            <div class="form-group">
+                <label for="selector">Target Element Selector:</label>
+                <input type="text" id="selector" value=".homepage-sandbox" placeholder="CSS selector (e.g., .class-name, #element-id)">
+            </div>
+            
+            <div class="form-group">
+                <label for="container">Container Selector (for mock elements):</label>
+                <input type="text" id="container" placeholder="CSS selector for container (optional)">
+            </div>
+
+            <div class="form-group">
+                <label for="distinct-id">Distinct ID:</label>
+                <input type="text" id="distinct-id" placeholder="user-123">
+            </div>
+            
+            <div class="form-group">
+                <label for="groups">Groups (JSON):</label>
+                <textarea id="groups" placeholder='{"company": "acme"}'></textarea>
+            </div>
+            
+            <div class="form-group">
+                <label for="person-properties">Person Properties (JSON):</label>
+                <textarea id="person-properties" placeholder='{"plan": "premium"}'></textarea>
+            </div>
+            
+            <div class="form-group">
+                <label for="group-properties">Group Properties (JSON):</label>
+                <textarea id="group-properties" placeholder='{"company_size": 100}'></textarea>
+            </div>
+            
+            <div class="form-group">
+                <label for="display-mode">Display Mode:</label>
+                <select id="display-mode">
+                    <option value="console">Console Only</option>
+                    <option value="window">Console + Visual Debugger</option>
+                </select>
+            </div>
+            
             <button id="generate-url" class="btn">Generate URL</button>
         </div>
         
-        <div id="result" class="result-box" style="display: none;">
-            <h3>Generated URL</h3>
-            <div class="url-container">
-                <input type="text" id="generated-url" readonly>
-                <button id="copy-url" class="btn">Copy</button>
+        <div class="url-preview" id="url-preview">
+            Generated URL will appear here
+        </div>
+        
+        <div class="controls">
+            <button id="copy-url" class="btn secondary">Copy URL</button>
+            <button id="test-url" class="btn">Test on this page</button>
+        </div>
+        
+        <div id="mock-posthog-controls">
+            <h3>Mock PostHog Controls</h3>
+            <p>Use these options to simulate different PostHog loading behaviors:</p>
+            
+            <div class="controls">
+                <button id="init-posthog-btn" class="btn">Initialize Mock PostHog</button>
+                <button id="toggle-flag-btn" class="btn secondary">Toggle Feature Flag</button>
+                <button id="toggle-debugger-btn" class="btn secondary">Toggle Debugger Window</button>
+            </div>
+            
+            <div class="warning-box">
+                <strong>Demo Only:</strong> These controls create a mock PostHog object for testing. In a real environment, use your actual PostHog configuration.
             </div>
         </div>
     </div>
     
     <div id="setup-instructions" class="tab-content">
-        <h3>Setup Instructions</h3>
-        <ol>
-            <li>Copy the generated URL</li>
-            <li>Open your browser's developer tools (F12)</li>
-            <li>Go to the Console tab</li>
-            <li>Paste and run the URL</li>
-            <li>Check the console output for flag evaluation details</li>
-        </ol>
+        <h3>Setting Up the Feature Flag Debugger</h3>
+        
+        <div class="steps">
+            <div class="step">
+                <div class="step-number">1</div>
+                <div class="step-content">
+                    <h4>Add the debugger script to your page</h4>
+                    <p>Include the enhanced flag debugger script in your HTML file:</p>
+                    <pre>&lt;script src="enhanced-flag-debugger.js"&gt;&lt;/script&gt;</pre>
+                    <p>Add this script after your PostHog initialization code to ensure it can detect PostHog properly.</p>
+                </div>
+            </div>
+            
+            <div class="step">
+                <div class="step-number">2</div>
+                <div class="step-content">
+                    <h4>Enable the debugger with URL parameters</h4>
+                    <p>The debugger only activates when you include <code>?debugPHFlags</code> in your URL. This ensures regular users don't see debugging information.</p>
+                    <pre>https://yourdomain.com/yourpage?debugPHFlags</pre>
+                    <p>By default, this will only log to the console and check for the <code>sandbox_embed</code> flag with an expected value of <code>with-sandbox</code>.</p>
+                </div>
+            </div>
+            
+            <div class="step">
+                <div class="step-number">3</div>
+                <div class="step-content">
+                    <h4>Design your HTML with flag-controlled elements</h4>
+                    <p>For proper testing, ensure your flag-controlled elements have appropriate selectors:</p>
+<pre>&lt;!-- Example: Element controlled by a feature flag --&gt;
+&lt;div class="feature-container" style="display: none;"&gt;
+    Feature content here
+&lt;/div&gt;</pre>
+                    <p>The debugger will handle showing/hiding these elements based on the flag value.</p>
+                </div>
+            </div>
+            
+            <div class="step">
+                <div class="step-number">4</div>
+                <div class="step-content">
+                    <h4>Test in different scenarios</h4>
+                    <p>Test your implementation with various flag values to ensure proper handling of all cases.</p>
+                    <div class="info-box">
+                        <strong>Tip:</strong> The debugger is designed to be safe in production since it only activates when explicitly enabled via the URL parameter.
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
     
     <div id="documentation" class="tab-content">
-        <h3>Documentation</h3>
-        <p>This tool helps you debug feature flag evaluation by:</p>
-        <ul>
-            <li>Generating a URL with the correct parameters</li>
-            <li>Showing the exact values used for evaluation</li>
-            <li>Displaying the evaluation result</li>
-            <li>Providing detailed logs for debugging</li>
-        </ul>
+        <h3>Debugger Documentation</h3>
+        
+        <h4>URL Parameters</h4>
+        <p>Customize the debugger behavior with the following URL parameters:</p>
+        <table class="sql-results-table">
+            <thead>
+                <tr>
+                    <th>Parameter</th>
+                    <th>Description</th>
+                    <th>Default Value</th>
+                    <th>Example</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><code>debugPHFlags</code></td>
+                    <td>Enables the debugger (required)</td>
+                    <td>N/A</td>
+                    <td><code>?debugPHFlags</code></td>
+                </tr>
+                <tr>
+                    <td><code>flag_name</code></td>
+                    <td>The name of the feature flag to check</td>
+                    <td><code>sandbox_embed</code></td>
+                    <td><code>&flag_name=new_ui</code></td>
+                </tr>
+                <tr>
+                    <td><code>flag_value</code></td>
+                    <td>The expected value of the flag</td>
+                    <td><code>with-sandbox</code></td>
+                    <td><code>&flag_value=true</code></td>
+                </tr>
+                <tr>
+                    <td><code>selector</code></td>
+                    <td>CSS selector for the element to check/inject</td>
+                    <td><code>.homepage-sandbox</code></td>
+                    <td><code>&selector=.feature-box</code></td>
+                </tr>
+                <tr>
+                    <td><code>container</code></td>
+                    <td>Where to inject a mock element if needed</td>
+                    <td><code>body</code></td>
+                    <td><code>&container=#app</code></td>
+                </tr>
+                <tr>
+                    <td><code>mode</code></td>
+                    <td>Display mode (console or window)</td>
+                    <td><code>console</code></td>
+                    <td><code>&mode=window</code></td>
+                </tr>
+                <tr>
+                    <td><code>distinct_id</code></td>
+                    <td>User distinct ID for flag targeting</td>
+                    <td>N/A</td>
+                    <td><code>&distinct_id=user-123</code></td>
+                </tr>
+                <tr>
+                    <td><code>groups</code></td>
+                    <td>JSON-encoded groups for targeting</td>
+                    <td>N/A</td>
+                    <td><code>&groups=%7B%22company%22%3A%22acme%22%7D</code></td>
+                </tr>
+            </tbody>
+        </table>
+        
+        <h4>JavaScript API</h4>
+        <p>The debugger exposes the following methods for programmatic access:</p>
+        <pre>// Get complete debug report
+window.PostHogDebugger.getDebugReport()
+
+// Toggle visibility of the debugger panel
+window.PostHogDebugger.toggleVisibility()
+
+// Access timing data
+window.PostHogDebugger.timing</pre>
+
+        <h4>Common Use Cases</h4>
+        <div class="info-box">
+            <p><strong>Race Condition Diagnosis</strong></p>
+            <p>If elements controlled by flags flash or appear momentarily before being hidden, use <code>?debugPHFlags&mode=window</code> to see exact timing between flag loading and DOM updates.</p>
+        </div>
+        
+        <div class="info-box">
+            <p><strong>Custom Flag Values</strong></p>
+            <p>For flags with non-boolean values like strings or numbers, use <code>?debugPHFlags&flag_name=my_flag&flag_value=expected_value</code> to test specific combinations.</p>
+        </div>
+        
+        <div class="info-box">
+            <p><strong>Multiple Elements</strong></p>
+            <p>To test multiple elements, create separate debugging URLs for each element or use a common class selector for groups of elements.</p>
+        </div>
     </div>
 </div>
 ` %>
@@ -86,3 +259,265 @@
     currentPage: 'flag-debugger',
     content: content
 }) %>
+
+<script>
+    // Mock PostHog Implementation (for demo purposes)
+    let mockPostHogInitialized = false;
+    let flagEnabled = false;
+    let flagName = '';
+    let flagValue = '';
+
+    // Initialize mock PostHog
+    function initMockPostHog() {
+        // Get values from the form
+        flagName = document.getElementById('flag-name').value;
+        flagValue = document.getElementById('flag-value').value;
+        
+        window.posthog = {
+            onFeatureFlags: function(callback) {
+                console.log("Mock PostHog: onFeatureFlags called");
+                
+                // Store callback for future use
+                window.posthog._callbacks = window.posthog._callbacks || [];
+                window.posthog._callbacks.push(callback);
+                
+                // Simulate random delay to help demonstrate race conditions
+                const delay = Math.floor(Math.random() * 500) + 100;
+                console.log(`Mock PostHog: Simulating ${delay}ms delay before loading flags`);
+                
+                setTimeout(() => {
+                    console.log("Mock PostHog: Feature flags loaded");
+                    window.posthog.featureFlags = { flagsLoaded: true };
+                    if (callback) callback();
+                }, delay);
+            },
+            getFeatureFlag: function(requestedFlagName) {
+                console.log(`Mock PostHog: getFeatureFlag called for '${requestedFlagName}'`);
+                if (requestedFlagName === flagName) {
+                    return flagEnabled ? flagValue : 'disabled';
+                }
+                return null;
+            },
+            featureFlags: {
+                flagsLoaded: false
+            },
+            _callbacks: []
+        };
+        
+        mockPostHogInitialized = true;
+        console.log(`Mock PostHog: Initialized with flag name: ${flagName}, possible values: ${flagValue} or 'disabled'`);
+    }
+
+    // Toggle the feature flag value
+    function toggleFeatureFlag() {
+        if (!mockPostHogInitialized) {
+            alert("Please initialize mock PostHog first!");
+            return;
+        }
+        
+        flagEnabled = !flagEnabled;
+        const currentValue = flagEnabled ? flagValue : 'disabled'; 
+        console.log(`Mock PostHog: Feature flag '${flagName}' set to '${currentValue}'`);
+        
+        // If debugger is initialized, trigger all callbacks to simulate flag change
+        if (window.posthog && window.posthog._callbacks) {
+            console.log("Mock PostHog: Re-running callbacks to notify of flag change");
+            window.posthog._callbacks.forEach(callback => {
+                try {
+                    callback();
+                } catch (e) {
+                    console.error("Error in callback:", e);
+                }
+            });
+        }
+        
+        return currentValue;
+    }
+
+    // Generate URL from form values
+    function generateUrl() {
+        const flagName = document.getElementById('flag-name').value;
+        const flagValue = document.getElementById('flag-value').value;
+        const selector = document.getElementById('selector').value;
+        const container = document.getElementById('container').value;
+        const displayMode = document.getElementById('display-mode').value;
+        const distinctId = document.getElementById('distinct-id').value;
+        
+        // Parse JSON fields and handle validation
+        let groups = {};
+        let personProperties = {};
+        let groupProperties = {};
+        
+        try {
+            const groupsText = document.getElementById('groups').value;
+            if (groupsText) {
+                groups = JSON.parse(groupsText);
+            }
+        } catch (e) {
+            alert('Invalid JSON in Groups field');
+            return;
+        }
+        
+        try {
+            const personPropsText = document.getElementById('person-properties').value;
+            if (personPropsText) {
+                personProperties = JSON.parse(personPropsText);
+            }
+        } catch (e) {
+            alert('Invalid JSON in Person Properties field');
+            return;
+        }
+        
+        try {
+            const groupPropsText = document.getElementById('group-properties').value;
+            if (groupPropsText) {
+                groupProperties = JSON.parse(groupPropsText);
+            }
+        } catch (e) {
+            alert('Invalid JSON in Group Properties field');
+            return;
+        }
+        
+        let url = new URL(window.location.href);
+        url.search = '';
+        url.searchParams.set('debugPHFlags', '');
+        
+        if (flagName) url.searchParams.set('flag_name', flagName);
+        if (flagValue) url.searchParams.set('flag_value', flagValue);
+        if (selector) url.searchParams.set('selector', selector);
+        if (container) url.searchParams.set('container', container);
+        if (displayMode !== 'console') url.searchParams.set('mode', displayMode);
+        if (distinctId) url.searchParams.set('distinct_id', distinctId);
+        
+        // Add JSON params if they contain data
+        if (Object.keys(groups).length > 0) {
+            url.searchParams.set('groups', JSON.stringify(groups));
+        }
+        if (Object.keys(personProperties).length > 0) {
+            url.searchParams.set('person_properties', JSON.stringify(personProperties));
+        }
+        if (Object.keys(groupProperties).length > 0) {
+            url.searchParams.set('group_properties', JSON.stringify(groupProperties));
+        }
+        
+        document.getElementById('url-preview').textContent = url.toString();
+    }
+
+    // Tab functionality
+    function activateTab(tabId) {
+        // Hide all tab content
+        document.querySelectorAll('.tab-content').forEach(tab => {
+            tab.classList.remove('active');
+        });
+        
+        // Deactivate all tab buttons
+        document.querySelectorAll('.tab-button').forEach(button => {
+            button.classList.remove('active');
+        });
+        
+        // Activate the selected tab and its button
+        document.getElementById(tabId).classList.add('active');
+        document.querySelector(`.tab-button[data-tab="${tabId}"]`).classList.add('active');
+    }
+
+    // Initialize when document is ready
+    document.addEventListener('DOMContentLoaded', function() {
+        // Initialize tab functionality
+        document.querySelectorAll('.tab-button').forEach(button => {
+            button.addEventListener('click', function() {
+                activateTab(this.dataset.tab);
+            });
+        });
+        
+        // Initialize form handlers
+        document.getElementById('generate-url').addEventListener('click', generateUrl);
+        
+        document.getElementById('copy-url').addEventListener('click', function() {
+            const url = document.getElementById('url-preview').textContent;
+            if (url && url !== 'Generated URL will appear here') {
+                navigator.clipboard.writeText(url).then(() => {
+                    alert('URL copied to clipboard!');
+                });
+            } else {
+                alert('Please generate a URL first');
+            }
+        });
+        
+        document.getElementById('test-url').addEventListener('click', function() {
+            const url = document.getElementById('url-preview').textContent;
+            if (url && url !== 'Generated URL will appear here') {
+                window.location.href = url;
+            } else {
+                alert('Please generate a URL first');
+            }
+        });
+        
+        document.getElementById('init-posthog-btn').addEventListener('click', initMockPostHog);
+        
+        document.getElementById('toggle-flag-btn').addEventListener('click', toggleFeatureFlag);
+        
+        document.getElementById('toggle-debugger-btn').addEventListener('click', function() {
+            if (window.PostHogDebugger && typeof window.PostHogDebugger.toggleVisibility === 'function') {
+                window.PostHogDebugger.toggleVisibility();
+            } else {
+                alert('Debugger is not active. Add ?debugPHFlags to your URL first.');
+            }
+        });
+        
+        // Initialize URL preview with current URL parameters
+        if (window.location.search.includes('debugPHFlags')) {
+            document.getElementById('url-preview').textContent = window.location.href;
+            
+            // Populate form fields from URL
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.has('flag_name')) {
+                document.getElementById('flag-name').value = urlParams.get('flag_name');
+            }
+            if (urlParams.has('flag_value')) {
+                document.getElementById('flag-value').value = urlParams.get('flag_value');
+            }
+            if (urlParams.has('selector')) {
+                document.getElementById('selector').value = urlParams.get('selector');
+            }
+            if (urlParams.has('container')) {
+                document.getElementById('container').value = urlParams.get('container');
+            }
+            if (urlParams.has('mode')) {
+                document.getElementById('display-mode').value = urlParams.get('mode');
+            }
+            if (urlParams.has('distinct_id')) {
+                document.getElementById('distinct-id').value = urlParams.get('distinct_id');
+            }
+            if (urlParams.has('groups')) {
+                try {
+                    document.getElementById('groups').value = JSON.stringify(
+                        JSON.parse(urlParams.get('groups')), null, 2
+                    );
+                } catch (e) {
+                    console.error('Error parsing groups from URL:', e);
+                }
+            }
+            if (urlParams.has('person_properties')) {
+                try {
+                    document.getElementById('person-properties').value = JSON.stringify(
+                        JSON.parse(urlParams.get('person_properties')), null, 2
+                    );
+                } catch (e) {
+                    console.error('Error parsing person properties from URL:', e);
+                }
+            }
+            if (urlParams.has('group_properties')) {
+                try {
+                    document.getElementById('group-properties').value = JSON.stringify(
+                        JSON.parse(urlParams.get('group_properties')), null, 2
+                    );
+                } catch (e) {
+                    console.error('Error parsing group properties from URL:', e);
+                }
+            }
+        } else {
+            // Generate default URL
+            generateUrl();
+        }
+    });
+</script>
