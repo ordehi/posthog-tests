@@ -2,10 +2,8 @@
 node_modules/
 
 # Build artifacts
-docs/
+dist/
 *.html
-styles/
-scripts/
 
 # IDE files
 .vscode/
