@@ -1,14 +1,6 @@
 # Dependencies
 node_modules/
 
-# Build artifacts
-docs/
-!docs/.gitkeep
-*.html
-!index.html
-styles/
-scripts/
-
 # IDE files
 .vscode/
 .idea/

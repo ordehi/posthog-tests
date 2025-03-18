@@ -1,0 +1,165 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PostHog Feature Flag Debugger - PostHog Tools</title>
+    <link rel="stylesheet" href="/styles/main.css">
+    <script src="/scripts/posthog.js"></script>
+    
+</head>
+<body>
+    <header>
+    <h1>PostHog Feature Flag Debugger</h1>
+    
+        <p class="subtitle">Diagnose race conditions &amp; timing issues with PostHog feature flags</p>
+    
+</header>
+    <nav>
+    <ul>
+        <li><a href="/" >Home</a></li>
+        <li><a href="/flag-debugger" class=&#34;active&#34;>Feature Flag Debugger</a></li>
+        <li><a href="/sql-client" >SQL Client</a></li>
+        
+        <!-- Surveys Section -->
+        <li class="nav-section">
+            <div class="nav-section-header">
+                <span>Surveys</span>
+                <button class="toggle-btn" aria-expanded="false">▶</button>
+            </div>
+            <ul class="nav-section-content" style="display: none;">
+                <li><a href="/surveys/selector-target" >Selector Target</a></li>
+            </ul>
+        </li>
+    </ul>
+</nav>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Get all nav sections
+    const navSections = document.querySelectorAll('.nav-section');
+    
+    // Check if current page is in a section
+    const currentPath = window.location.pathname;
+    const currentSection = Array.from(navSections).find(section => {
+        const links = section.querySelectorAll('a');
+        return Array.from(links).some(link => link.getAttribute('href') === currentPath);
+    });
+
+    // If current page is in a section, expand that section
+    if (currentSection) {
+        const toggleBtn = currentSection.querySelector('.toggle-btn');
+        const content = currentSection.querySelector('.nav-section-content');
+        toggleBtn.setAttribute('aria-expanded', 'true');
+        toggleBtn.textContent = '▼';
+        content.style.display = 'block';
+    }
+
+    // Add click handlers to toggle buttons
+    navSections.forEach(section => {
+        const toggleBtn = section.querySelector('.toggle-btn');
+        const content = section.querySelector('.nav-section-content');
+        
+        toggleBtn.addEventListener('click', () => {
+            const isExpanded = toggleBtn.getAttribute('aria-expanded') === 'true';
+            toggleBtn.setAttribute('aria-expanded', !isExpanded);
+            toggleBtn.textContent = isExpanded ? '▶' : '▼';
+            content.style.display = isExpanded ? 'none' : 'block';
+        });
+    });
+});
+</script>
+    
+    <main>
+        
+<div class="card">
+    <h2>Flag Debugger Configuration</h2>
+    
+    <!-- Tab navigation -->
+    <div class="tabs">
+        <button class="tab-button active" data-tab="debugger-config">Debugger Config</button>
+        <button class="tab-button" data-tab="setup-instructions">Setup Instructions</button>
+        <button class="tab-button" data-tab="documentation">Documentation</button>
+    </div>
+    
+    <!-- Tab content -->
+    <div id="debugger-config" class="tab-content active">
+        <p>Use this tool to generate a URL with the right parameters for the feature flag debugger.</p>
+        
+        <div class="form-group">
+            <label for="flag-key">Feature Flag Key</label>
+            <input type="text" id="flag-key" placeholder="my-feature-flag">
+        </div>
+        
+        <div class="form-group">
+            <label for="flag-value">Expected Value</label>
+            <input type="text" id="flag-value" placeholder="true">
+        </div>
+        
+        <div class="form-group">
+            <label for="distinct-id">Distinct ID</label>
+            <input type="text" id="distinct-id" placeholder="user-123">
+        </div>
+        
+        <div class="form-group">
+            <label for="groups">Groups (JSON)</label>
+            <textarea id="groups" placeholder='{"company": "acme"}'></textarea>
+        </div>
+        
+        <div class="form-group">
+            <label for="person-properties">Person Properties (JSON)</label>
+            <textarea id="person-properties" placeholder='{"plan": "premium"}'></textarea>
+        </div>
+        
+        <div class="form-group">
+            <label for="group-properties">Group Properties (JSON)</label>
+            <textarea id="group-properties" placeholder='{"company_size": 100}'></textarea>
+        </div>
+        
+        <div class="button-container">
+            <button id="generate-url" class="btn">Generate URL</button>
+        </div>
+        
+        <div id="result" class="result-box" style="display: none;">
+            <h3>Generated URL</h3>
+            <div class="url-container">
+                <input type="text" id="generated-url" readonly>
+                <button id="copy-url" class="btn">Copy</button>
+            </div>
+        </div>
+    </div>
+    
+    <div id="setup-instructions" class="tab-content">
+        <h3>Setup Instructions</h3>
+        <ol>
+            <li>Copy the generated URL</li>
+            <li>Open your browser's developer tools (F12)</li>
+            <li>Go to the Console tab</li>
+            <li>Paste and run the URL</li>
+            <li>Check the console output for flag evaluation details</li>
+        </ol>
+    </div>
+    
+    <div id="documentation" class="tab-content">
+        <h3>Documentation</h3>
+        <p>This tool helps you debug feature flag evaluation by:</p>
+        <ul>
+            <li>Generating a URL with the correct parameters</li>
+            <li>Showing the exact values used for evaluation</li>
+            <li>Displaying the evaluation result</li>
+            <li>Providing detailed logs for debugging</li>
+        </ul>
+    </div>
+</div>
+
+    </main>
+
+    <footer>
+    <p>PostHog Tools Hub | For demonstration and testing purposes only</p>
+</footer>
+
+    
+</body>
+</html>

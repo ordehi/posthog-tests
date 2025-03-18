@@ -1,0 +1,125 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PostHog Tools Hub - PostHog Tools</title>
+    <link rel="stylesheet" href="/styles/main.css">
+    <script src="/scripts/posthog.js"></script>
+    
+</head>
+<body>
+    <header>
+    <h1>PostHog Tools Hub</h1>
+    
+        <p class="subtitle">Collection of useful tools for PostHog users</p>
+    
+</header>
+    <nav>
+    <ul>
+        <li><a href="/" >Home</a></li>
+        <li><a href="/flag-debugger" >Feature Flag Debugger</a></li>
+        <li><a href="/sql-client" >SQL Client</a></li>
+        
+        <!-- Surveys Section -->
+        <li class="nav-section">
+            <div class="nav-section-header">
+                <span>Surveys</span>
+                <button class="toggle-btn" aria-expanded="false">▶</button>
+            </div>
+            <ul class="nav-section-content" style="display: none;">
+                <li><a href="/surveys/selector-target" >Selector Target</a></li>
+            </ul>
+        </li>
+    </ul>
+</nav>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Get all nav sections
+    const navSections = document.querySelectorAll('.nav-section');
+    
+    // Check if current page is in a section
+    const currentPath = window.location.pathname;
+    const currentSection = Array.from(navSections).find(section => {
+        const links = section.querySelectorAll('a');
+        return Array.from(links).some(link => link.getAttribute('href') === currentPath);
+    });
+
+    // If current page is in a section, expand that section
+    if (currentSection) {
+        const toggleBtn = currentSection.querySelector('.toggle-btn');
+        const content = currentSection.querySelector('.nav-section-content');
+        toggleBtn.setAttribute('aria-expanded', 'true');
+        toggleBtn.textContent = '▼';
+        content.style.display = 'block';
+    }
+
+    // Add click handlers to toggle buttons
+    navSections.forEach(section => {
+        const toggleBtn = section.querySelector('.toggle-btn');
+        const content = section.querySelector('.nav-section-content');
+        
+        toggleBtn.addEventListener('click', () => {
+            const isExpanded = toggleBtn.getAttribute('aria-expanded') === 'true';
+            toggleBtn.setAttribute('aria-expanded', !isExpanded);
+            toggleBtn.textContent = isExpanded ? '▶' : '▼';
+            content.style.display = isExpanded ? 'none' : 'block';
+        });
+    });
+});
+</script>
+    
+    <main>
+        
+<div class="card">
+    <h2>Welcome to PostHog Tools Hub</h2>
+    <p>This is a collection of useful tools for PostHog users. These tools are designed to help you debug, analyze, and work with PostHog more effectively.</p>
+    
+    <div class="info-box">
+        <strong>Note:</strong> These tools are for demonstration and debugging purposes. Always ensure you're following best security practices when handling API keys and sensitive data.
+    </div>
+</div>
+
+<h2>Available Tools</h2>
+
+<div class="card-grid">
+    <div class="card">
+        <h3>Feature Flag Debugger</h3>
+        <p>A tool to help diagnose race conditions and timing issues with PostHog feature flags and DOM interactions.</p>
+        <div class="button-container">
+            <a href="/flag-debugger" class="btn">Open Tool</a>
+        </div>
+    </div>
+    
+    <div class="card">
+        <h3>SQL Client</h3>
+        <p>Run SQL queries against your PostHog instance to fetch and analyze your data directly.</p>
+        <div class="button-container">
+            <a href="/sql-client" class="btn">Open Tool</a>
+        </div>
+    </div>
+    
+    <!-- Template for adding new tool cards -->
+    <!--
+    <div class="card">
+        <h3>Tool Name</h3>
+        <p>Brief description of the tool and what it does.</p>
+        <div class="button-container">
+            <a href="tool-page.html" class="btn">Open Tool</a>
+        </div>
+    </div>
+    -->
+</div>
+
+    </main>
+
+    <footer>
+    <p>PostHog Tools Hub | For demonstration and testing purposes only</p>
+</footer>
+
+    
+</body>
+</html> 

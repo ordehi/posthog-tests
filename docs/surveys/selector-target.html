@@ -1,0 +1,114 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PostHog Survey Selector Test - PostHog Tools</title>
+    <link rel="stylesheet" href="/styles/main.css">
+    <script src="/scripts/posthog.js"></script>
+    
+</head>
+<body>
+    <header>
+    <h1>PostHog Survey Selector Test</h1>
+    
+        <p class="subtitle">Testing survey targeting with CSS selectors</p>
+    
+</header>
+    <nav>
+    <ul>
+        <li><a href="/" >Home</a></li>
+        <li><a href="/flag-debugger" >Feature Flag Debugger</a></li>
+        <li><a href="/sql-client" >SQL Client</a></li>
+        
+        <!-- Surveys Section -->
+        <li class="nav-section">
+            <div class="nav-section-header">
+                <span>Surveys</span>
+                <button class="toggle-btn" aria-expanded="false">▶</button>
+            </div>
+            <ul class="nav-section-content" style="display: none;">
+                <li><a href="/surveys/selector-target" class=&#34;active&#34;>Selector Target</a></li>
+            </ul>
+        </li>
+    </ul>
+</nav>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Get all nav sections
+    const navSections = document.querySelectorAll('.nav-section');
+    
+    // Check if current page is in a section
+    const currentPath = window.location.pathname;
+    const currentSection = Array.from(navSections).find(section => {
+        const links = section.querySelectorAll('a');
+        return Array.from(links).some(link => link.getAttribute('href') === currentPath);
+    });
+
+    // If current page is in a section, expand that section
+    if (currentSection) {
+        const toggleBtn = currentSection.querySelector('.toggle-btn');
+        const content = currentSection.querySelector('.nav-section-content');
+        toggleBtn.setAttribute('aria-expanded', 'true');
+        toggleBtn.textContent = '▼';
+        content.style.display = 'block';
+    }
+
+    // Add click handlers to toggle buttons
+    navSections.forEach(section => {
+        const toggleBtn = section.querySelector('.toggle-btn');
+        const content = section.querySelector('.nav-section-content');
+        
+        toggleBtn.addEventListener('click', () => {
+            const isExpanded = toggleBtn.getAttribute('aria-expanded') === 'true';
+            toggleBtn.setAttribute('aria-expanded', !isExpanded);
+            toggleBtn.textContent = isExpanded ? '▶' : '▼';
+            content.style.display = isExpanded ? 'none' : 'block';
+        });
+    });
+});
+</script>
+    
+    <main>
+        
+<div class="card">
+    <h2>Survey Selector Test Page</h2>
+    
+    <div class="info-box">
+        <strong>Test Purpose:</strong> This page demonstrates a PostHog survey that is targeted using the CSS selector <code>#car_type_question_survey</code>.
+    </div>
+
+    <div class="mock-area">
+        <h3>Test Area</h3>
+        <p>This area contains the target container where the survey should appear.</p>
+        
+        <!-- This is the target container for the survey -->
+        <div id="car_type_question_survey" class="survey-container">
+            <p class="placeholder-text">Survey should appear here when targeted correctly</p>
+        </div>
+    </div>
+
+    <div class="controls">
+        <button id="init-posthog-btn" class="btn">Initialize PostHog</button>
+        <button id="toggle-survey-btn" class="btn secondary">Toggle Survey Visibility</button>
+    </div>
+
+    <div class="warning-box">
+        <strong>Demo Only:</strong> This page is for testing survey targeting functionality. In a real environment, use your actual PostHog configuration.
+    </div>
+</div>
+
+<script src="/scripts/selector-target.js"></script>
+
+    </main>
+
+    <footer>
+    <p>PostHog Tools Hub | For demonstration and testing purposes only</p>
+</footer>
+
+    
+</body>
+</html>
