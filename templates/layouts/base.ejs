@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %> - PostHog Tools</title>
+    <link rel="stylesheet" href="/styles/main.css">
+    <script src="/scripts/posthog.js"></script>
+    <%- typeof stylesheets !== 'undefined' ? stylesheets : '' %>
+</head>
+<body>
+    <%- include('../partials/header', { title, subtitle }) %>
+    <%- include('../partials/nav', { currentPage }) %>
+    
+    <main>
+        <%- content %>
+    </main>
+
+    <%- include('../partials/footer') %>
+    <%- typeof scripts !== 'undefined' ? scripts : '' %>
+</body>
+</html>

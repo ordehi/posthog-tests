@@ -3,89 +3,120 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PostHog SQL Client</title>
-    <link rel="stylesheet" href="styles.css">
-    <script src="posthog.js"></script>
+    <title>PostHog Tools Hub - PostHog Tools</title>
+    <link rel="stylesheet" href="/styles/main.css">
+    <script src="/scripts/posthog.js"></script>
+    
 </head>
 <body>
     <header>
-        <h1>PostHog SQL Client</h1>
-        <p class="subtitle">Run SQL queries against your PostHog instance</p>
-    </header>
-
+    <h1>PostHog Tools Hub</h1>
+    
+        <p class="subtitle">Collection of useful tools for PostHog users</p>
+    
+</header>
     <nav>
-        <ul>
-            <li><a href="index.html">Home</a></li>
-            <li><a href="flag-debugger.html">Feature Flag Debugger</a></li>
-            <li><a href="sql-client.html" class="active">SQL Client</a></li>
-            <!-- Add new pages here as they become available -->
-        </ul>
-    </nav>
-
+    <ul>
+        <li><a href="/" >Home</a></li>
+        <li><a href="/flag-debugger" >Feature Flag Debugger</a></li>
+        <li><a href="/sql-client" class=&#34;active&#34;>SQL Client</a></li>
+        <!-- Add new pages here as they become available -->
+    </ul>
+</nav>
+    
     <main>
-        <div class="container">
-            <div class="input-row">
-                <div class="form-group">
-                    <label for="host">Host</label>
-                    <select id="host">
-                        <option value="https://us.posthog.com">US Cloud (us.posthog.com)</option>
-                        <option value="https://eu.posthog.com">EU Cloud (eu.posthog.com)</option>
-                        <option value="custom">Custom Host</option>
-                    </select>
-                </div>
-                <div class="form-group" id="custom-host-container" style="display: none;">
-                    <label for="custom-host">Custom Host URL</label>
-                    <input type="text" id="custom-host" placeholder="https://your-posthog-instance.com">
-                </div>
-            </div>
+        
 
-            <div class="input-row">
-                <div class="form-group">
-                    <label for="project-id">Project ID</label>
-                    <input type="text" id="project-id" placeholder="your_project_id">
-                </div>
-                <div class="form-group">
-                    <label for="api-key">Personal API Key</label>
-                    <input type="text" id="api-key" placeholder="your_personal_api_key">
-                </div>
-            </div>
-
-            <div class="form-group">
-                <label for="query">SQL Query</label>
-                <textarea id="query" placeholder="Example: SELECT properties FROM events WHERE timestamp > toDateTime('2025-02-26T14:05:00.000000Z') and timestamp <= toDateTime('2025-02-26T20:05:00.000000Z')">SELECT properties FROM events WHERE timestamp > toDateTime('2025-02-26T14:05:00.000000Z') and timestamp <= toDateTime('2025-02-26T20:05:00.000000Z')</textarea>
-            </div>
-
-            <div class="button-container">
-                <button id="fetch-button" class="btn accent">Run Query</button>
-                <div class="loader" id="loader"></div>
-                <span class="status" id="status"></span>
-            </div>
-
-            <div class="tabs">
-                <button class="tab-button active" data-tab="formatted">Formatted Results</button>
-                <button class="tab-button" data-tab="raw">Raw JSON Response</button>
-            </div>
-            
-            <div class="tab-content active" id="formatted-tab">
-                <div class="output-container">
-                    <button class="copy-button" id="copy-formatted-button" style="display: none;">Copy</button>
-                    <div id="formatted-output" class="output-placeholder">Formatted query results will appear here</div>
-                </div>
-            </div>
-            
-            <div class="tab-content" id="raw-tab">
-                <div class="output-container">
-                    <button class="copy-button" id="copy-raw-button" style="display: none;">Copy</button>
-                    <div id="raw-output" class="output-placeholder">Raw JSON response will appear here</div>
-                </div>
-            </div>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PostHog SQL Client - PostHog Tools</title>
+    <link rel="stylesheet" href="/styles/main.css">
+    <script src="/scripts/posthog.js"></script>
+    
+</head>
+<body>
+    <header>
+    <h1>PostHog SQL Client</h1>
+    
+        <p class="subtitle">Run SQL queries against your PostHog instance</p>
+    
+</header>
+    <nav>
+    <ul>
+        <li><a href="/" >Home</a></li>
+        <li><a href="/flag-debugger" >Feature Flag Debugger</a></li>
+        <li><a href="/sql-client" class=&#34;active&#34;>SQL Client</a></li>
+        <!-- Add new pages here as they become available -->
+    </ul>
+</nav>
+    
+    <main>
+        
+<div class="container">
+    <div class="input-row">
+        <div class="form-group">
+            <label for="host">Host</label>
+            <select id="host">
+                <option value="https://us.posthog.com">US Cloud (us.posthog.com)</option>
+                <option value="https://eu.posthog.com">EU Cloud (eu.posthog.com)</option>
+                <option value="custom">Custom Host</option>
+            </select>
         </div>
+        <div class="form-group" id="custom-host-container" style="display: none;">
+            <label for="custom-host">Custom Host URL</label>
+            <input type="text" id="custom-host" placeholder="https://your-posthog-instance.com">
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label for="api-key">API Key</label>
+        <input type="password" id="api-key" placeholder="Enter your PostHog API key">
+    </div>
+
+    <div class="form-group">
+        <label for="query">SQL Query</label>
+        <textarea id="query" rows="10" placeholder="SELECT * FROM events LIMIT 10"></textarea>
+    </div>
+
+    <div class="button-container">
+        <button id="run-query" class="btn">Run Query</button>
+    </div>
+
+    <div id="results" class="results-container" style="display: none;">
+        <h3>Query Results</h3>
+        <div class="table-container">
+            <table class="sql-results-table">
+                <thead>
+                    <tr id="header-row"></tr>
+                </thead>
+                <tbody id="results-body"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <div id="error" class="error-message" style="display: none;"></div>
+</div>
+
+<script src="/scripts/sql-client.js"></script>
+
     </main>
 
     <footer>
-        <p>PostHog Tools Hub | For demonstration and debugging purposes only</p>
-    </footer>
+    <p>PostHog Tools Hub | For demonstration and testing purposes only</p>
+</footer>
 
-    <script src="sql-client.js"></script>
+    
+</body>
+</html> 
+    </main>
+
+    <footer>
+    <p>PostHog Tools Hub | For demonstration and testing purposes only</p>
+</footer>
+
+    
 </body>
 </html>

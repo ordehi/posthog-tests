@@ -1,0 +1,48 @@
+<% const content = `
+<div class="card">
+    <h2>Welcome to PostHog Tools Hub</h2>
+    <p>This is a collection of useful tools for PostHog users. These tools are designed to help you debug, analyze, and work with PostHog more effectively.</p>
+    
+    <div class="info-box">
+        <strong>Note:</strong> These tools are for demonstration and debugging purposes. Always ensure you're following best security practices when handling API keys and sensitive data.
+    </div>
+</div>
+
+<h2>Available Tools</h2>
+
+<div class="card-grid">
+    <div class="card">
+        <h3>Feature Flag Debugger</h3>
+        <p>A tool to help diagnose race conditions and timing issues with PostHog feature flags and DOM interactions.</p>
+        <div class="button-container">
+            <a href="/flag-debugger" class="btn">Open Tool</a>
+        </div>
+    </div>
+    
+    <div class="card">
+        <h3>SQL Client</h3>
+        <p>Run SQL queries against your PostHog instance to fetch and analyze your data directly.</p>
+        <div class="button-container">
+            <a href="/sql-client" class="btn">Open Tool</a>
+        </div>
+    </div>
+    
+    <!-- Template for adding new tool cards -->
+    <!--
+    <div class="card">
+        <h3>Tool Name</h3>
+        <p>Brief description of the tool and what it does.</p>
+        <div class="button-container">
+            <a href="tool-page.html" class="btn">Open Tool</a>
+        </div>
+    </div>
+    -->
+</div>
+` %>
+
+<%- include('../../../templates/layouts/base', {
+    title: 'PostHog Tools Hub',
+    subtitle: 'Collection of useful tools for PostHog users',
+    currentPage: 'home',
+    content: content
+}) %> 

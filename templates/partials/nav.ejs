@@ -1,0 +1,54 @@
+<nav>
+    <ul>
+        <li><a href="/" <%= currentPage === 'index' ? 'class="active"' : '' %>>Home</a></li>
+        <li><a href="/flag-debugger" <%= currentPage === 'flag-debugger' ? 'class="active"' : '' %>>Feature Flag Debugger</a></li>
+        <li><a href="/sql-client" <%= currentPage === 'sql-client' ? 'class="active"' : '' %>>SQL Client</a></li>
+        
+        <!-- Surveys Section -->
+        <li class="nav-section">
+            <div class="nav-section-header">
+                <span>Surveys</span>
+                <button class="toggle-btn" aria-expanded="false">▶</button>
+            </div>
+            <ul class="nav-section-content" style="display: none;">
+                <li><a href="/surveys/selector-target" <%= currentPage === 'selector-target' ? 'class="active"' : '' %>>Selector Target</a></li>
+            </ul>
+        </li>
+    </ul>
+</nav>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Get all nav sections
+    const navSections = document.querySelectorAll('.nav-section');
+    
+    // Check if current page is in a section
+    const currentPath = window.location.pathname;
+    const currentSection = Array.from(navSections).find(section => {
+        const links = section.querySelectorAll('a');
+        return Array.from(links).some(link => link.getAttribute('href') === currentPath);
+    });
+
+    // If current page is in a section, expand that section
+    if (currentSection) {
+        const toggleBtn = currentSection.querySelector('.toggle-btn');
+        const content = currentSection.querySelector('.nav-section-content');
+        toggleBtn.setAttribute('aria-expanded', 'true');
+        toggleBtn.textContent = '▼';
+        content.style.display = 'block';
+    }
+
+    // Add click handlers to toggle buttons
+    navSections.forEach(section => {
+        const toggleBtn = section.querySelector('.toggle-btn');
+        const content = section.querySelector('.nav-section-content');
+        
+        toggleBtn.addEventListener('click', () => {
+            const isExpanded = toggleBtn.getAttribute('aria-expanded') === 'true';
+            toggleBtn.setAttribute('aria-expanded', !isExpanded);
+            toggleBtn.textContent = isExpanded ? '▶' : '▼';
+            content.style.display = isExpanded ? 'none' : 'block';
+        });
+    });
+});
+</script>

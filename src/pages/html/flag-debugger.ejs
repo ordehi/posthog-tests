@@ -1,60 +1,4 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PostHog Tools Hub - PostHog Tools</title>
-    <link rel="stylesheet" href="/styles/main.css">
-    <script src="/scripts/posthog.js"></script>
-    
-</head>
-<body>
-    <header>
-    <h1>PostHog Tools Hub</h1>
-    
-        <p class="subtitle">Collection of useful tools for PostHog users</p>
-    
-</header>
-    <nav>
-    <ul>
-        <li><a href="/" >Home</a></li>
-        <li><a href="/flag-debugger" class=&#34;active&#34;>Feature Flag Debugger</a></li>
-        <li><a href="/sql-client" >SQL Client</a></li>
-        <!-- Add new pages here as they become available -->
-    </ul>
-</nav>
-    
-    <main>
-        
-
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PostHog Feature Flag Debugger - PostHog Tools</title>
-    <link rel="stylesheet" href="/styles/main.css">
-    <script src="/scripts/posthog.js"></script>
-    
-</head>
-<body>
-    <header>
-    <h1>PostHog Feature Flag Debugger</h1>
-    
-        <p class="subtitle">Diagnose race conditions &amp; timing issues with PostHog feature flags</p>
-    
-</header>
-    <nav>
-    <ul>
-        <li><a href="/" >Home</a></li>
-        <li><a href="/flag-debugger" class=&#34;active&#34;>Feature Flag Debugger</a></li>
-        <li><a href="/sql-client" >SQL Client</a></li>
-        <!-- Add new pages here as they become available -->
-    </ul>
-</nav>
-    
-    <main>
-        
+<% const content = `
 <div class="card">
     <h2>Flag Debugger Configuration</h2>
     
@@ -134,22 +78,11 @@
         </ul>
     </div>
 </div>
+` %>
 
-    </main>
-
-    <footer>
-    <p>PostHog Tools Hub | For demonstration and testing purposes only</p>
-</footer>
-
-    
-</body>
-</html>
-    </main>
-
-    <footer>
-    <p>PostHog Tools Hub | For demonstration and testing purposes only</p>
-</footer>
-
-    
-</body>
-</html>
+<%- include('../../../templates/layouts/base', {
+    title: 'PostHog Feature Flag Debugger',
+    subtitle: 'Diagnose race conditions & timing issues with PostHog feature flags',
+    currentPage: 'flag-debugger',
+    content: content
+}) %>

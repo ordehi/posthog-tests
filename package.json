@@ -1,0 +1,28 @@
+{
+  "name": "posthog-tests",
+  "version": "1.0.0",
+  "description": "",
+  "main": "build.js",
+  "scripts": {
+    "build": "node build.js",
+    "watch": "node build.js --watch",
+    "serve": "node server.js",
+    "dev": "npm run build && npm run serve",
+    "start": "npm run build && npm run serve"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ordehi/posthog-tests.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ordehi/posthog-tests/issues"
+  },
+  "homepage": "https://github.com/ordehi/posthog-tests#readme",
+  "dependencies": {
+    "ejs": "^3.1.10",
+    "express": "^4.21.2"
+  }
+}
