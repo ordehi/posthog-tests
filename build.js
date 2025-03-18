@@ -133,7 +133,7 @@ function copyStaticAssets() {
     // Copy CSS files
     copyFileOrDir('src/styles', 'docs/styles');
     // Copy JavaScript files
-    copyFileOrDir('src/scripts', 'docs/js');
+    copyFileOrDir('src/scripts', 'docs/scripts');
 }
 
 // Main build function
