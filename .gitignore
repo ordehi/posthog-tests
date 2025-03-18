@@ -1,6 +1,12 @@
 # Dependencies
 node_modules/
 
+# Build artifacts
+docs/
+*.html
+styles/
+scripts/
+
 # IDE files
 .vscode/
 .idea/
