@@ -131,7 +131,7 @@ async function buildPages() {
 // Copy static assets
 function copyStaticAssets() {
     // Copy CSS files
-    copyFileOrDir('src/styles/css', 'docs/css');
+    copyFileOrDir('src/styles', 'docs/styles');
     // Copy JavaScript files
     copyFileOrDir('src/scripts', 'docs/js');
 }
