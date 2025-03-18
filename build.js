@@ -130,17 +130,10 @@ async function buildPages() {
 
 // Copy static assets
 function copyStaticAssets() {
-    // Copy styles
-    const stylesDir = path.join(config.srcDir, 'styles');
-    const stylesDestDir = path.join(config.outputDir, 'styles');
-    ensureDir(stylesDestDir);
-    copyFileOrDir(stylesDir, stylesDestDir);
-
-    // Copy scripts
-    const scriptsDir = path.join(config.srcDir, 'scripts');
-    const scriptsDestDir = path.join(config.outputDir, 'scripts');
-    ensureDir(scriptsDestDir);
-    copyFileOrDir(scriptsDir, scriptsDestDir);
+    // Copy CSS files
+    copyFileOrDir('src/styles/css', 'docs/css');
+    // Copy JavaScript files
+    copyFileOrDir('src/scripts', 'docs/js');
 }
 
 // Main build function
