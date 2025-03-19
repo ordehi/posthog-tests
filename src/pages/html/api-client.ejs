@@ -4,12 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PostHog API Client</title>
-    <% 
-    // Check if we're on GitHub Pages
-    const isGitHubPages = typeof window !== 'undefined' && window.location && window.location.hostname.includes('github.io');
-    const basePath = isGitHubPages ? '/posthog-tests' : '';
-    %>
-    <link rel="stylesheet" href="<%= basePath %>/styles/main.css">
+    <link rel="stylesheet" href="./styles/main.css">
     <!-- Add highlight.js CSS from CDN -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/atom-one-dark.min.css">
     <!-- highlight.js scripts -->
@@ -17,14 +12,14 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/javascript.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/bash.min.js"></script>
     <!-- API Client scripts (as type="module" to support ES6 imports) -->
-    <script type="module" src="<%= basePath %>/scripts/api-client.js"></script>
+    <script type="module" src="./scripts/api-client.js"></script>
 </head>
 <body>
 <%- include('../../../templates/layouts/base', {
     title: 'PostHog API Client',
     subtitle: 'Interact with PostHog APIs',
     currentPage: 'api-client',
-    stylesheets: `<link rel="stylesheet" href="${basePath}/styles/api-client.css">`,
+    stylesheets: '<link rel="stylesheet" href="./styles/api-client.css">',
     content: `
 <div class="container">
     <div class="section-header">
