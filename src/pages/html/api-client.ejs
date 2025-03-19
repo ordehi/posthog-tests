@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
     <title>PostHog API Client</title>
     <link rel="stylesheet" href="./styles/main.css">
     <!-- Add highlight.js CSS from CDN -->
@@ -21,7 +21,7 @@
     currentPage: 'api-client',
     stylesheets: '<link rel="stylesheet" href="./styles/api-client.css">',
     content: `
-<div class="container">
+<div class="container mobile-friendly-container">
     <div class="section-header">
         <h2>PostHog API Client</h2>
         <p>Interact with PostHog APIs through a no-code interface and generate code snippets for your language of choice</p>
@@ -84,7 +84,7 @@
             <div id="query-endpoint" class="api-endpoint-content" style="display: block;">
                 <div class="form-group">
                     <label for="query">SQL Query</label>
-                    <textarea id="query" placeholder="SELECT properties FROM events WHERE timestamp > toDateTime('2025-02-26T14:05:00.000000Z') and timestamp <= toDateTime('2025-02-26T20:05:00.000000Z')"></textarea>
+                    <textarea id="query" class="json-input" placeholder="SELECT event, count() FROM events GROUP BY event LIMIT 10"></textarea>
                 </div>
                 
                 <div class="button-container">
@@ -112,7 +112,7 @@
                 
                 <div class="form-group">
                     <label for="properties">Properties (JSON)</label>
-                    <textarea id="properties" placeholder='{ "property1": "value1" }'></textarea>
+                    <textarea id="properties" class="json-input" placeholder='{ "property1": "value1" }'></textarea>
                 </div>
                 
                 <div class="button-container">
@@ -135,12 +135,12 @@
                 
                 <div class="form-group">
                     <label for="person-properties">Person Properties (JSON)</label>
-                    <textarea id="person-properties" placeholder='{ "email": "user@example.com" }'></textarea>
+                    <textarea id="person-properties" class="json-input" placeholder='{ "email": "user@example.com" }'></textarea>
                 </div>
                 
                 <div class="form-group">
                     <label for="groups">Groups (JSON)</label>
-                    <textarea id="groups" placeholder='{ "company": "company_id_1" }'></textarea>
+                    <textarea id="groups" class="json-input" placeholder='{ "company": "company_id_1" }'></textarea>
                 </div>
                 
                 <div class="button-container">

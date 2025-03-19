@@ -563,7 +563,7 @@ footer {
     }
 
     main {
-        padding: 0 1rem;
+        padding: 0 0rem;
     }
 
     .controls {
@@ -587,6 +587,146 @@ footer {
     .input-row {
         flex-direction: column;
         gap: 0;
+    }
+}
+
+/* Better placeholder visibility */
+::placeholder {
+    color: #aaa;
+    opacity: 0.7;
+}
+
+@media (max-width: 767px) {
+    ::placeholder {
+        color: #888;
+        opacity: 1;
+    }
+}
+
+/* Header Styles */
+header {
+    background: linear-gradient(135deg, var(--primary-color), var(--highlight-color));
+    color: white;
+    padding: 2rem;
+    text-align: center;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+header h1 {
+    font-size: 2.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.subtitle {
+    font-size: 1.2rem;
+    opacity: 0.9;
+}
+
+@media (max-width: 768px) {
+    header {
+        padding: 1.5rem;
+    }
+
+    header h1 {
+        font-size: 1.8rem;
+    }
+    
+    .subtitle {
+        font-size: 1rem;
+    }
+}
+
+/* Navigation Styles */
+nav {
+    background-color: var(--dark-color);
+    padding: 0.5rem 1rem;
+    margin-bottom: 1.5rem;
+}
+
+nav ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-wrap: wrap;
+}
+
+nav li {
+    margin: 0.5rem 1rem;
+}
+
+nav a {
+    color: white;
+    text-decoration: none;
+    padding: 0.5rem 0;
+    display: inline-block;
+    position: relative;
+    transition: color 0.3s;
+    font-weight: 500;
+}
+
+nav a:hover {
+    color: var(--secondary-color);
+}
+
+nav a::after {
+    content: '';
+    position: absolute;
+    width: 0;
+    height: 2px;
+    bottom: 0;
+    left: 0;
+    background-color: var(--secondary-color);
+    transition: width 0.3s;
+}
+
+nav a:hover::after {
+    width: 100%;
+}
+
+nav a.active {
+    color: var(--secondary-color);
+}
+
+nav a.active::after {
+    width: 100%;
+}
+
+@media (max-width: 768px) {
+    nav {
+        padding: 0.25rem 0.5rem;
+    }
+    
+    nav ul {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    nav ul li {
+        margin: 0.5rem 0;
+        width: 100%;
+        text-align: center;
+    }
+    
+    nav a {
+        display: block;
+        padding: 0.75rem 0;
+    }
+}
+
+/* Footer styling */
+footer {
+    background-color: var(--dark-color);
+    color: white;
+    padding: 2rem;
+    text-align: center;
+    margin-top: 3rem;
+}
+
+@media (max-width: 768px) {
+    footer {
+        padding: 1.5rem;
+        margin-top: 2rem;
     }
 }
 
