@@ -10,13 +10,11 @@
 
 // Initialize code preview when DOM is loaded
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('Checking for highlight.js:', typeof hljs !== 'undefined' ? 'Available' : 'Not available');
     initCodePreview();
 });
 
 // Export functions for use in other modules
 export function updateCodePreview(endpoint, language) {
-    console.log(`Updating code preview for endpoint: ${endpoint}, language: ${language}`);
     
     const codePreviewElement = document.getElementById('code-preview');
     if (!codePreviewElement) {
@@ -66,12 +64,10 @@ export function updateCodePreview(endpoint, language) {
         
         // Apply syntax highlighting if hljs is available (loaded via CDN)
         if (typeof hljs !== 'undefined') {
-            console.log('Applying syntax highlighting with highlight.js');
             const hlLanguage = language === 'curl' ? 'bash' : 'javascript';
             try {
                 const highlightedCode = hljs.highlight(code, { language: hlLanguage }).value;
                 codeContentElement.innerHTML = highlightedCode;
-                console.log('Highlighting applied successfully');
             } catch (e) {
                 console.error('Error applying syntax highlighting:', e);
                 // Fallback to basic HTML escaping
@@ -112,7 +108,6 @@ export function getCurrentLanguage() {
  * Initialize code preview component
  */
 function initCodePreview() {
-    console.log('Initializing code preview component');
     
     // Code preview tab switching
     const codeTabs = document.querySelectorAll('.code-tab');
