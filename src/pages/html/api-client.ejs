@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PostHog API Client</title>
+    <link rel="stylesheet" href="/styles/main.css">
+    <!-- Add highlight.js CSS from CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/atom-one-dark.min.css">
+    <!-- highlight.js scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/javascript.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/bash.min.js"></script>
+    <!-- API Client scripts (as type="module" to support ES6 imports) -->
+    <script type="module" src="/scripts/api-client.js"></script>
+</head>
+<body>
+<%- include('../../../templates/layouts/base', {
+    title: 'PostHog API Client',
+    subtitle: 'Interact with PostHog APIs',
+    currentPage: 'api-client',
+    stylesheets: '<link rel="stylesheet" href="/styles/api-client.css">',
+    content: `
+<div class="container">
+    <div class="section-header">
+        <h2>PostHog API Client</h2>
+        <p>Interact with PostHog APIs through a no-code interface and generate code snippets for your language of choice</p>
+    </div>
+
+    <div class="api-client-container">
+        <div class="panel connection-panel">
+            <h3>Connection Settings</h3>
+            <div class="input-row">
+                <div class="form-group">
+                    <label for="host">Host</label>
+                    <select id="host">
+                        <option value="https://us.posthog.com">US Cloud (us.posthog.com)</option>
+                        <option value="https://eu.posthog.com">EU Cloud (eu.posthog.com)</option>
+                        <option value="custom">Custom Host</option>
+                    </select>
+                </div>
+                <div class="form-group" id="custom-host-container" style="display: none;">
+                    <label for="custom-host">Custom Host URL</label>
+                    <input type="text" id="custom-host" placeholder="https://your-posthog-instance.com">
+                </div>
+            </div>
+
+            <div class="input-row">
+                <div class="form-group">
+                    <label for="project-id">Project ID</label>
+                    <input type="text" id="project-id" placeholder="your_project_id">
+                </div>
+                <div class="form-group">
+                    <label for="api-key">Personal API Key</label>
+                    <input type="password" id="api-key" placeholder="your_personal_api_key">
+                </div>
+            </div>
+        </div>
+
+        <div class="panel endpoint-selector-panel">
+            <h3>API Endpoint</h3>
+            <p class="panel-description">Select an API endpoint to interact with:</p>
+            
+            <div class="endpoint-selector">
+                <div class="endpoint-selector-tabs">
+                    <button class="endpoint-tab active" data-endpoint="query">
+                        <span class="endpoint-icon">📊</span>
+                        <span class="endpoint-name">Query API</span>
+                    </button>
+                    <button class="endpoint-tab" data-endpoint="capture">
+                        <span class="endpoint-icon">📡</span>
+                        <span class="endpoint-name">Capture API</span>
+                    </button>
+                    <button class="endpoint-tab" data-endpoint="decide">
+                        <span class="endpoint-icon">🚩</span>
+                        <span class="endpoint-name">Decide API</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <div id="api-endpoint-container" class="api-endpoint-container">
+            <!-- Query API Content -->
+            <div id="query-endpoint" class="api-endpoint-content" style="display: block;">
+                <div class="form-group">
+                    <label for="query">SQL Query</label>
+                    <textarea id="query" placeholder="SELECT properties FROM events WHERE timestamp > toDateTime('2025-02-26T14:05:00.000000Z') and timestamp <= toDateTime('2025-02-26T20:05:00.000000Z')"></textarea>
+                </div>
+                
+                <div class="button-container">
+                    <button id="query-button" class="btn accent">Run Query</button>
+                    <div class="loader query-loader"></div>
+                    <span class="status query-status"></span>
+                </div>
+                
+                <div class="output-container">
+                    <div id="query-output" class="output-placeholder">Query results will appear here</div>
+                </div>
+            </div>
+            
+            <!-- Capture API Content -->
+            <div id="capture-endpoint" class="api-endpoint-content" style="display: none;">
+                <div class="form-group">
+                    <label for="event-name">Event Name</label>
+                    <input type="text" id="event-name" placeholder="event_name">
+                </div>
+                
+                <div class="form-group">
+                    <label for="distinct-id">Distinct ID</label>
+                    <input type="text" id="distinct-id" placeholder="user_123">
+                </div>
+                
+                <div class="form-group">
+                    <label for="properties">Properties (JSON)</label>
+                    <textarea id="properties" placeholder='{ "property1": "value1" }'></textarea>
+                </div>
+                
+                <div class="button-container">
+                    <button id="capture-button" class="btn accent">Send Event</button>
+                    <div class="loader capture-loader"></div>
+                    <span class="status capture-status"></span>
+                </div>
+                
+                <div class="output-container">
+                    <div id="capture-output" class="output-placeholder">Capture results will appear here</div>
+                </div>
+            </div>
+            
+            <!-- Decide API Content -->
+            <div id="decide-endpoint" class="api-endpoint-content" style="display: none;">
+                <div class="form-group">
+                    <label for="decide-distinct-id">Distinct ID</label>
+                    <input type="text" id="decide-distinct-id" placeholder="user_123">
+                </div>
+                
+                <div class="form-group">
+                    <label for="person-properties">Person Properties (JSON)</label>
+                    <textarea id="person-properties" placeholder='{ "email": "user@example.com" }'></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label for="groups">Groups (JSON)</label>
+                    <textarea id="groups" placeholder='{ "company": "company_id_1" }'></textarea>
+                </div>
+                
+                <div class="button-container">
+                    <button id="decide-button" class="btn accent">Evaluate Flags</button>
+                    <div class="loader decide-loader"></div>
+                    <span class="status decide-status"></span>
+                </div>
+                
+                <div class="output-container">
+                    <div id="decide-output" class="output-placeholder">Feature flag evaluations will appear here</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Code Preview Panel -->
+        <div class="panel code-preview-panel">
+            <h3>Code Preview</h3>
+            <p class="panel-description">Copy this code to use in your application:</p>
+            
+            <div class="code-preview-tabs">
+                <button class="code-tab active" data-language="javascript">JavaScript</button>
+                <button class="code-tab" data-language="curl">cURL</button>
+            </div>
+            
+            <div class="code-preview-container">
+                <div id="code-preview" class="code-preview">
+                    <pre class="code-content hljs">// Code will appear here based on your settings</pre>
+                </div>
+                <button id="copy-code-button" class="copy-button">Copy</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Inline script for immediate tab switching without depending on external file -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Get all endpoint tabs
+    var endpointTabs = document.querySelectorAll('.endpoint-tab');
+    console.log('Found ' + endpointTabs.length + ' endpoint tabs');
+    
+    // Add click event listeners to each tab
+    endpointTabs.forEach(function(tab) {
+        tab.addEventListener('click', function(e) {
+            e.preventDefault();
+            console.log('Tab clicked: ' + this.getAttribute('data-endpoint'));
+            
+            // Update active tab styling
+            endpointTabs.forEach(function(t) { 
+                t.classList.remove('active');
+            });
+            this.classList.add('active');
+            
+            // Get the endpoint name from the data attribute
+            var endpoint = this.getAttribute('data-endpoint');
+            
+            // Hide all endpoint content
+            var contents = document.querySelectorAll('.api-endpoint-content');
+            contents.forEach(function(content) {
+                content.style.display = 'none';
+            });
+            
+            // Show the selected endpoint content
+            var selectedContent = document.getElementById(endpoint + '-endpoint');
+            if (selectedContent) {
+                selectedContent.style.display = 'block';
+            }
+            
+            // Dispatch custom event for endpoint change
+            var event = new CustomEvent('endpointChanged', {
+                detail: { endpoint: endpoint }
+            });
+            document.dispatchEvent(event);
+        });
+    });
+});
+</script>
+`
+}) %> 
+</body>
+</html> 

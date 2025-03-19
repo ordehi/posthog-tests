@@ -1,0 +1,91 @@
+<div class="api-endpoint-content" id="capture-endpoint">
+    <div class="panel capture-panel">
+        <h3>Capture Event</h3>
+        <p class="endpoint-description">Send events to PostHog using the Capture API</p>
+        
+        <div class="form-group">
+            <label for="event-name">Event Name</label>
+            <input type="text" id="event-name" placeholder="e.g., page_view, button_click, etc.">
+        </div>
+        
+        <div class="form-group">
+            <label for="distinct-id">Distinct ID</label>
+            <input type="text" id="distinct-id" placeholder="User or visitor identifier">
+        </div>
+        
+        <div class="form-group">
+            <label for="properties">Event Properties (JSON)</label>
+            <textarea id="properties" rows="6" placeholder='{ "source": "api-client", "url": "https://example.com" }'>{
+    "source": "api-client",
+    "url": "https://example.com"
+}</textarea>
+        </div>
+        
+        <div class="button-container">
+            <button id="capture-button" class="btn accent">Send Event</button>
+            <div class="loader" id="capture-loader"></div>
+            <span class="status" id="capture-status"></span>
+        </div>
+    </div>
+
+    <div class="panel code-preview-panel">
+        <h3>Code Preview</h3>
+        <p class="panel-description">JavaScript code to execute this request:</p>
+        <div class="code-preview-container">
+            <button class="copy-button" id="copy-capture-code-button">Copy</button>
+            <div id="capture-code-preview" class="code-preview"></div>
+        </div>
+    </div>
+
+    <div class="panel results-panel">
+        <h3>Response</h3>
+        <div class="output-container">
+            <div id="capture-response" class="output-placeholder">Response will appear here after sending an event</div>
+        </div>
+    </div>
+
+    <div class="panel documentation-panel">
+        <h3>API Documentation</h3>
+        <div class="documentation-content">
+            <h4>PostHog Capture API</h4>
+            <p>The Capture API allows you to send events to PostHog from any source.</p>
+            
+            <div class="endpoint-details">
+                <span class="method post">POST</span>
+                <span class="endpoint-path">/capture/</span>
+            </div>
+            
+            <h5>Request Parameters:</h5>
+            <ul class="parameter-list">
+                <li>
+                    <strong>api_key</strong> (required): Your PostHog project API key
+                </li>
+                <li>
+                    <strong>event</strong> (required): The name of the event
+                </li>
+                <li>
+                    <strong>distinct_id</strong> (required): Unique identifier for the user or visitor
+                </li>
+                <li>
+                    <strong>properties</strong> (optional): Properties to associate with the event
+                </li>
+                <li>
+                    <strong>timestamp</strong> (optional): ISO 8601 timestamp of when the event occurred (defaults to now)
+                </li>
+            </ul>
+            
+            <h5>Example Request:</h5>
+            <pre>{
+    "api_key": "your_api_key",
+    "event": "page_view",
+    "distinct_id": "user123",
+    "properties": {
+        "path": "/home",
+        "referrer": "https://google.com"
+    }
+}</pre>
+            
+            <p class="documentation-note">Note: Events are batched by default to improve performance. They may not appear immediately in PostHog.</p>
+        </div>
+    </div>
+</div> 

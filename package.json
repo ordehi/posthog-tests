@@ -23,6 +23,7 @@
   "homepage": "https://github.com/ordehi/posthog-tests#readme",
   "dependencies": {
     "ejs": "^3.1.10",
-    "express": "^4.21.2"
+    "express": "^4.21.2",
+    "highlight.js": "^11.11.1"
   }
 }

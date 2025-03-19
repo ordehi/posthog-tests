@@ -1,0 +1,671 @@
+/* API Client Styles */
+
+.api-client-container {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+}
+
+@media (min-width: 992px) {
+    .api-client-container {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+.panel {
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.connection-panel {
+    grid-column: 1 / -1;
+}
+
+.endpoint-selector-panel {
+    grid-column: 1 / -1;
+}
+
+.code-preview-panel {
+    grid-column: 1 / -1;
+}
+
+.panel h3 {
+    margin-top: 0;
+    margin-bottom: 1rem;
+    color: var(--primary-color);
+    border-bottom: 1px solid #eee;
+    padding-bottom: 0.5rem;
+}
+
+.panel-description {
+    margin-bottom: 1rem;
+    color: #666;
+}
+
+.input-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.input-row .form-group {
+    flex: 1;
+    min-width: 200px;
+}
+
+/* API Endpoint Selector */
+.endpoint-selector {
+    margin: 1rem 0 1.5rem;
+}
+
+.endpoint-selector-tabs {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.endpoint-tab {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1rem;
+    background-color: #f5f5f5;
+    border: 1px solid #e0e0e0;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-weight: 500;
+    color: #555;
+}
+
+.endpoint-tab:hover {
+    background-color: #eee;
+}
+
+.endpoint-tab.active {
+    background-color: var(--accent-color);
+    color: white;
+    border-color: var(--accent-color);
+}
+
+.endpoint-icon {
+    font-size: 1.2rem;
+}
+
+.endpoint-name {
+    font-size: 0.9rem;
+}
+
+.endpoint-description {
+    font-size: 0.8rem;
+    color: #777;
+    margin-top: 0.25rem;
+}
+
+/* API Endpoint Content */
+.api-endpoint-content {
+    display: none;
+    padding: 1.5rem;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    margin-bottom: 1.5rem;
+}
+
+/* Method Badges */
+.method-badge {
+    display: inline-block;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    font-weight: bold;
+    text-transform: uppercase;
+    margin-right: 0.5rem;
+}
+
+.method-post {
+    background-color: #10b981;
+    color: white;
+}
+
+.method-get {
+    background-color: #3b82f6;
+    color: white;
+}
+
+.method-delete {
+    background-color: #ef4444;
+    color: white;
+}
+
+/* Code Preview */
+.code-preview-panel {
+    position: relative;
+}
+
+.code-preview-tabs {
+    margin-bottom: 1rem;
+    display: flex;
+    gap: 0.5rem;
+}
+
+.code-tab {
+    padding: 0.5rem 1rem;
+    background-color: #f5f5f5;
+    border: 1px solid #e0e0e0;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.9rem;
+}
+
+.code-tab:hover {
+    background-color: #eee;
+}
+
+.code-tab.active {
+    background-color: var(--highlight-color);
+    color: white;
+    border-color: var(--highlight-color);
+}
+
+.code-preview-container {
+    position: relative;
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+.code-preview {
+    position: relative;
+    overflow: auto;
+    border-radius: 4px;
+    background-color: #282c34;
+    color: #abb2bf;
+    margin-bottom: 1rem;
+}
+
+.code-content {
+    font-family: monospace;
+    padding: 1rem;
+    margin: 0;
+    font-size: 14px;
+    line-height: 1.5;
+    overflow-x: auto;
+}
+
+/* Ensure hljs styles apply properly */
+.hljs {
+    display: block;
+    overflow-x: auto;
+    padding: 1rem;
+    background: #282c34;
+    color: #abb2bf;
+}
+
+.copy-button {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    padding: 5px 10px;
+    border: none;
+    background-color: rgba(255, 255, 255, 0.1);
+    color: #abb2bf;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+}
+
+.copy-button:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .input-row {
+        flex-direction: column;
+    }
+    
+    .input-row .form-group {
+        width: 100%;
+    }
+    
+    .endpoint-selector-tabs {
+        flex-direction: column;
+    }
+    
+    .endpoint-tab {
+        width: 100%;
+    }
+}
+
+.section-header {
+    margin-bottom: 20px;
+}
+
+.section-header h2 {
+    margin-bottom: 5px;
+}
+
+.section-header p {
+    color: #777;
+    margin: 0;
+}
+
+.endpoint-details {
+    background-color: #f8f8f8;
+    border-radius: 4px;
+    padding: 10px;
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.method {
+    font-weight: bold;
+    padding: 3px 8px;
+    border-radius: 3px;
+    color: white;
+    font-size: 12px;
+    text-transform: uppercase;
+}
+
+.method.post {
+    background-color: #49cc90;
+}
+
+.method.get {
+    background-color: #61affe;
+}
+
+.method.delete {
+    background-color: #f93e3e;
+}
+
+.endpoint-path {
+    font-family: monospace;
+    font-size: 14px;
+    color: #444;
+}
+
+.parameter-list {
+    padding-left: 20px;
+    margin-bottom: 15px;
+}
+
+.parameter-list li {
+    margin-bottom: 8px;
+}
+
+/* Form elements */
+.form-group {
+    flex: 1;
+    min-width: 200px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 500;
+    font-size: 14px;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.form-group textarea {
+    resize: vertical;
+    min-height: 120px;
+    font-family: monospace;
+}
+
+/* Query panel */
+.query-panel .form-group {
+    margin-bottom: 15px;
+}
+
+/* Results panel */
+.output-container {
+    background-color: #f9f9f9;
+    border: 1px solid #eee;
+    border-radius: 4px;
+    padding: 15px;
+    overflow: auto;
+    max-height: 500px;
+}
+
+.output-placeholder {
+    color: #888;
+    font-style: italic;
+}
+
+.error-box {
+    background-color: #fff2f2;
+    color: #d33;
+    padding: 10px;
+    border-radius: 4px;
+    border-left: 4px solid #d33;
+    margin-bottom: 15px;
+}
+
+.info-box {
+    background-color: #f0f7ff;
+    color: #0066cc;
+    padding: 10px;
+    border-radius: 4px;
+    border-left: 4px solid #0066cc;
+    margin-bottom: 15px;
+}
+
+/* Documentation panel */
+.documentation-panel {
+    background-color: #f9f9f9;
+}
+
+.documentation-content h4 {
+    margin-top: 0;
+    margin-bottom: 10px;
+}
+
+.documentation-content p {
+    margin-top: 0;
+    margin-bottom: 15px;
+}
+
+.query-examples {
+    padding-left: 20px;
+}
+
+.query-examples li {
+    margin-bottom: 15px;
+}
+
+.query-examples pre {
+    background-color: #f2f2f2;
+    padding: 8px;
+    border-radius: 4px;
+    margin: 5px 0 0 0;
+    overflow: auto;
+    font-size: 13px;
+}
+
+.documentation-note {
+    font-style: italic;
+    color: #666;
+    margin-top: 20px;
+}
+
+/* Buttons and actions */
+.button-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.btn {
+    background-color: #5451FF;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    padding: 8px 16px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.btn:hover {
+    background-color: #4240E4;
+}
+
+.btn:disabled {
+    background-color: #aaa;
+    cursor: not-allowed;
+}
+
+.btn.small {
+    padding: 6px 12px;
+    font-size: 13px;
+}
+
+.btn.accent {
+    background-color: #34BB78;
+}
+
+.btn.accent:hover {
+    background-color: #2DA569;
+}
+
+.export-buttons {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.export-buttons .copy-button {
+    position: static;
+    color: #333;
+    background-color: #f0f0f0;
+    border: 1px solid #ddd;
+}
+
+.export-buttons .copy-button:hover {
+    background-color: #e5e5e5;
+}
+
+/* Loading indicator */
+.loader {
+    display: none;
+    width: 20px;
+    height: 20px;
+    border: 3px solid #f3f3f3;
+    border-top: 3px solid #34BB78;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.status {
+    font-size: 14px;
+    color: #666;
+}
+
+.status.error {
+    color: #d33;
+}
+
+.status.success {
+    color: #34BB78;
+}
+
+/* Tabs */
+.tabs {
+    display: flex;
+    border-bottom: 1px solid #ddd;
+    margin-bottom: 15px;
+}
+
+.tab-button {
+    padding: 8px 15px;
+    background-color: transparent;
+    border: none;
+    border-bottom: 2px solid transparent;
+    cursor: pointer;
+    color: #666;
+    transition: all 0.2s;
+    margin-right: 5px;
+}
+
+.tab-button:hover {
+    color: #333;
+    background-color: #f8f8f8;
+}
+
+.tab-button.active {
+    color: #5451FF;
+    border-bottom-color: #5451FF;
+}
+
+.tab-content {
+    display: none;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+/* Query details */
+.query-details {
+    margin-top: 20px;
+    font-size: 14px;
+}
+
+.query-details details {
+    margin-bottom: 10px;
+    border: 1px solid #eee;
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.query-details summary {
+    padding: 8px 12px;
+    background-color: #f8f8f8;
+    cursor: pointer;
+    font-weight: 500;
+}
+
+.query-details pre {
+    margin: 0;
+    padding: 12px;
+    background-color: #f5f5f5;
+    overflow: auto;
+    font-size: 13px;
+}
+
+/* Hide all API endpoint content by default except the first one */
+.api-endpoint-content {
+    display: none;
+}
+
+.api-endpoint-content:first-of-type,
+#query-endpoint {
+    display: block;
+}
+
+/* Responsive */
+@media (min-width: 768px) {
+    .api-client-container {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .connection-panel,
+    .endpoint-selector-panel,
+    .api-endpoint-container {
+        grid-column: span 2;
+    }
+}
+
+@media (min-width: 1200px) {
+    .api-client-container {
+        grid-template-columns: repeat(3, 1fr);
+    }
+    
+    .connection-panel,
+    .endpoint-selector-panel {
+        grid-column: span 3;
+    }
+    
+    .api-endpoint-container {
+        grid-column: span 3;
+    }
+}
+
+/* Code Preview Panel */
+.code-preview-panel {
+    margin-top: 2rem;
+    width: 100%;
+    grid-column: span 3;
+}
+
+.code-preview-tabs {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.code-tab {
+    padding: 0.5rem 1rem;
+    background-color: #f3f4f6;
+    border: 1px solid #e5e7eb;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: all 0.2s ease;
+}
+
+.code-tab:hover {
+    background-color: #e5e7eb;
+}
+
+.code-tab.active {
+    background-color: #5042cc;
+    color: white;
+    border-color: #5042cc;
+}
+
+.code-preview-container {
+    position: relative;
+    margin-top: 1rem;
+    width: 100%;
+}
+
+.code-preview {
+    background-color: #1e1e1e;
+    border-radius: 4px;
+    padding: 1rem;
+    overflow-x: auto;
+    font-family: 'Consolas', 'Monaco', 'Andale Mono', monospace;
+    font-size: 0.9rem;
+    line-height: 1.5;
+    width: 100%;
+}
+
+.code-content {
+    margin: 0;
+    overflow-wrap: normal;
+    tab-size: 4;
+    color: #f8f8f2;
+    white-space: pre;
+    background: transparent;
+}
+
+.copy-button {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
+    padding: 0.3rem 0.6rem;
+    background-color: rgba(255, 255, 255, 0.1);
+    color: #f8f8f2;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.8rem;
+    transition: all 0.2s ease;
+}
+
+.copy-button:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+} 

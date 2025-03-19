@@ -1,0 +1,112 @@
+<div class="api-endpoint-content" id="decide-endpoint">
+    <div class="panel decide-panel">
+        <h3>Feature Flag Evaluation</h3>
+        <p class="endpoint-description">Check feature flag values for a user using the Decide API</p>
+        
+        <div class="form-group">
+            <label for="api-key-decide">API Key</label>
+            <input type="text" id="api-key-decide" placeholder="Your PostHog project API key">
+        </div>
+        
+        <div class="form-group">
+            <label for="distinct-id-decide">Distinct ID</label>
+            <input type="text" id="distinct-id-decide" placeholder="User identifier to evaluate flags for">
+        </div>
+        
+        <div class="form-group">
+            <label for="person-properties">Person Properties (optional)</label>
+            <textarea id="person-properties" rows="4" placeholder='{ "email": "test@example.com" }'></textarea>
+        </div>
+        
+        <div class="form-group">
+            <label for="groups">Groups (optional)</label>
+            <textarea id="groups" rows="4" placeholder='{ "company": "company_id_1" }'></textarea>
+        </div>
+        
+        <div class="button-container">
+            <button id="decide-button" class="btn accent">Evaluate Flags</button>
+            <div class="loader" id="decide-loader"></div>
+            <span class="status" id="decide-status"></span>
+        </div>
+    </div>
+
+    <div class="panel code-preview-panel">
+        <h3>Code Preview</h3>
+        <p class="panel-description">JavaScript code to execute this request:</p>
+        <div class="code-preview-container">
+            <button class="copy-button" id="copy-decide-code-button">Copy</button>
+            <div id="decide-code-preview" class="code-preview"></div>
+        </div>
+    </div>
+
+    <div class="panel results-panel">
+        <h3>Results</h3>
+        
+        <div class="tabs">
+            <button class="tab-button active" data-tab="decide-formatted">Formatted Results</button>
+            <button class="tab-button" data-tab="decide-raw">Raw JSON Response</button>
+        </div>
+        
+        <div class="tab-content active" id="decide-formatted-tab">
+            <div class="export-buttons">
+                <button class="copy-button" id="copy-decide-formatted-button" style="display: none;">Copy</button>
+            </div>
+            <div class="output-container">
+                <div id="decide-formatted-output" class="output-placeholder">Evaluate flags to see results</div>
+            </div>
+        </div>
+        
+        <div class="tab-content" id="decide-raw-tab">
+            <div class="export-buttons">
+                <button class="copy-button" id="copy-decide-raw-button" style="display: none;">Copy</button>
+            </div>
+            <div class="output-container">
+                <div id="decide-raw-output" class="output-placeholder">Evaluate flags to see raw JSON response</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="panel documentation-panel">
+        <h3>API Documentation</h3>
+        <div class="documentation-content">
+            <h4>PostHog Decide API</h4>
+            <p>The Decide API evaluates feature flags for a given user based on their distinct ID and properties.</p>
+            
+            <div class="endpoint-details">
+                <span class="method post">POST</span>
+                <span class="endpoint-path">/decide/</span>
+            </div>
+            
+            <h5>Request Parameters:</h5>
+            <ul class="parameter-list">
+                <li>
+                    <strong>api_key</strong> (required): Your PostHog project API key
+                </li>
+                <li>
+                    <strong>distinct_id</strong> (required): Unique identifier for the user
+                </li>
+                <li>
+                    <strong>person_properties</strong> (optional): Properties of the person for flag evaluation
+                </li>
+                <li>
+                    <strong>groups</strong> (optional): Group identifiers if using group-based feature flags
+                </li>
+            </ul>
+            
+            <h5>Example Request:</h5>
+            <pre>{
+    "api_key": "your_api_key",
+    "distinct_id": "user_123",
+    "person_properties": {
+        "email": "user@example.com",
+        "plan": "premium"
+    },
+    "groups": {
+        "company": "company_id_1"
+    }
+}</pre>
+            
+            <p class="documentation-note">Note: The Decide API returns all active feature flags for the user, along with other experimentation information.</p>
+        </div>
+    </div>
+</div> 

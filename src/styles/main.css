@@ -589,3 +589,9 @@ footer {
         gap: 0;
     }
 }
+
+/* Import syntax highlight styles */
+@import 'syntax-highlight.css';
+
+/* Import api client styles */
+@import 'api-client.css';

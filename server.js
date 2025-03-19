@@ -7,6 +7,9 @@ const fs = require('fs');
 // Serve static files from the dist directory
 app.use(express.static('dist'));
 
+// Serve files from node_modules for browser imports
+app.use('/node_modules', express.static('node_modules'));
+
 // Handle all routes
 app.get('*', (req, res) => {
     // Remove query parameters and hash

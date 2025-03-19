@@ -1,0 +1,90 @@
+<div class="api-endpoint-content" id="query-endpoint">
+    <div class="panel query-panel">
+        <h3>HogQL Query</h3>
+        <p class="endpoint-description">Run SQL queries against your PostHog instance using the HogQL Query API</p>
+        
+        <div class="form-group">
+            <label for="query">SQL Query</label>
+            <textarea id="query" rows="8" placeholder="Example: SELECT * FROM events LIMIT 100">SELECT * FROM events LIMIT 100</textarea>
+        </div>
+        
+        <div class="button-container">
+            <button id="fetch-button" class="btn accent">Run Query</button>
+            <div class="loader" id="loader"></div>
+            <span class="status" id="status"></span>
+        </div>
+    </div>
+
+    <div class="panel code-preview-panel">
+        <h3>Code Preview</h3>
+        <p class="panel-description">JavaScript code to execute this request:</p>
+        <div class="code-preview-container">
+            <button class="copy-button" id="copy-code-button">Copy</button>
+            <div id="code-preview" class="code-preview"></div>
+        </div>
+    </div>
+
+    <div class="panel results-panel">
+        <h3>Results</h3>
+        
+        <div class="tabs">
+            <button class="tab-button active" data-tab="formatted">Formatted Results</button>
+            <button class="tab-button" data-tab="raw">Raw JSON Response</button>
+        </div>
+        
+        <div class="tab-content active" id="formatted-tab">
+            <div class="export-buttons">
+                <button class="btn small" id="export-csv-button" style="display: none;">Export as CSV</button>
+                <button class="btn small" id="export-text-button" style="display: none;">Export as JSON</button>
+                <button class="copy-button" id="copy-formatted-button" style="display: none;">Copy</button>
+            </div>
+            <div class="output-container">
+                <div id="formatted-output" class="output-placeholder">Run a query to see results</div>
+            </div>
+        </div>
+        
+        <div class="tab-content" id="raw-tab">
+            <div class="export-buttons">
+                <button class="copy-button" id="copy-raw-button" style="display: none;">Copy</button>
+            </div>
+            <div class="output-container">
+                <div id="raw-output" class="output-placeholder">Run a query to see raw JSON response</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="panel documentation-panel">
+        <h3>API Documentation</h3>
+        <div class="documentation-content">
+            <h4>PostHog Query API</h4>
+            <p>The Query API allows you to run SQL queries against your PostHog data using HogQL.</p>
+            
+            <div class="endpoint-details">
+                <span class="method post">POST</span>
+                <span class="endpoint-path">/api/projects/:project_id/query/</span>
+            </div>
+            
+            <h5>Example Queries:</h5>
+            <ul class="query-examples">
+                <li>
+                    <strong>Get recent events:</strong>
+                    <pre>SELECT event, properties.$current_url FROM events ORDER BY timestamp DESC LIMIT 100</pre>
+                </li>
+                <li>
+                    <strong>Count events by type:</strong>
+                    <pre>SELECT event, count(*) as count FROM events GROUP BY event ORDER BY count DESC LIMIT 20</pre>
+                </li>
+                <li>
+                    <strong>Get persons with email:</strong>
+                    <pre>SELECT id, properties.email FROM persons WHERE properties.email IS NOT NULL LIMIT 100</pre>
+                </li>
+                <li>
+                    <strong>Events by country:</strong>
+                    <pre>SELECT properties.$geoip_country_name, count(*) FROM events GROUP BY properties.$geoip_country_name ORDER BY count(*) DESC</pre>
+                </li>
+            </ul>
+            
+            <p class="documentation-note">Note: This API is limited to 10,000 rows at 120 requests per hour. If you need more, use batch exports.</p>
+        </div>
+    </div>
+</div> 
