@@ -99,11 +99,19 @@ export function copyToClipboard(text, button) {
     navigator.clipboard.writeText(text).then(() => {
         const originalText = button.textContent;
         button.textContent = 'Copied!';
+        button.classList.add('copied');
+        
         setTimeout(() => {
             button.textContent = originalText;
+            button.classList.remove('copied');
         }, 2000);
     }).catch(err => {
         console.error('Could not copy text: ', err);
+        button.textContent = 'Failed!';
+        
+        setTimeout(() => {
+            button.textContent = 'Copy';
+        }, 2000);
     });
 }
 

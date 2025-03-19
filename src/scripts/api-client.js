@@ -350,3 +350,74 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 });
+
+/**
+ * Add copy button to output containers
+ * @param {HTMLElement} outputContainer - The output container element
+ */
+function addCopyButtonToOutput(outputContainer) {
+    // Check if button already exists
+    if (outputContainer.querySelector('.output-copy-button')) {
+        return;
+    }
+    
+    const copyButton = document.createElement('button');
+    copyButton.className = 'output-copy-button';
+    copyButton.textContent = 'Copy';
+    
+    // Position the button properly within the container
+    outputContainer.style.position = 'relative';
+    
+    copyButton.addEventListener('click', function() {
+        const preElement = outputContainer.querySelector('pre');
+        if (preElement) {
+            Utils.copyToClipboard(preElement.textContent, copyButton);
+        }
+    });
+    
+    outputContainer.appendChild(copyButton);
+}
+
+// Modify the endpoint execution functions to add copy buttons
+const originalExecuteQueryAPI = Endpoints.executeQueryAPI;
+Endpoints.executeQueryAPI = async function(elements, connectionInfo) {
+    try {
+        const result = await originalExecuteQueryAPI(elements, connectionInfo);
+        // Only add the copy button if there's content to copy
+        if (elements.queryOutput && elements.queryOutput.querySelector('pre')) {
+            addCopyButtonToOutput(elements.queryOutput.closest('.output-container'));
+        }
+        return result;
+    } catch (error) {
+        console.error('Error in executeQueryAPI:', error);
+        throw error;
+    }
+};
+
+const originalExecuteCaptureAPI = Endpoints.executeCaptureAPI;
+Endpoints.executeCaptureAPI = async function(elements, connectionInfo) {
+    try {
+        const result = await originalExecuteCaptureAPI(elements, connectionInfo);
+        if (elements.captureOutput && elements.captureOutput.querySelector('pre')) {
+            addCopyButtonToOutput(elements.captureOutput.closest('.output-container'));
+        }
+        return result;
+    } catch (error) {
+        console.error('Error in executeCaptureAPI:', error);
+        throw error;
+    }
+};
+
+const originalExecuteDecideAPI = Endpoints.executeDecideAPI;
+Endpoints.executeDecideAPI = async function(elements, connectionInfo) {
+    try {
+        const result = await originalExecuteDecideAPI(elements, connectionInfo);
+        if (elements.decideOutput && elements.decideOutput.querySelector('pre')) {
+            addCopyButtonToOutput(elements.decideOutput.closest('.output-container'));
+        }
+        return result;
+    } catch (error) {
+        console.error('Error in executeDecideAPI:', error);
+        throw error;
+    }
+};

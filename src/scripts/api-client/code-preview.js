@@ -5,6 +5,9 @@
  * for the different API endpoints.
  */
 
+// Import utility functions
+import * as Utils from './utils.js';
+
 // We'll use highlight.js from the global context via CDN
 // The rest of the module will use standard exports
 
@@ -137,14 +140,8 @@ function initCodePreview() {
                 tempDiv.innerHTML = codeElement.innerHTML;
                 const codeText = tempDiv.textContent || tempDiv.innerText;
                 
-                navigator.clipboard.writeText(codeText).then(() => {
-                    copyButton.textContent = 'Copied!';
-                    setTimeout(() => {
-                        copyButton.textContent = 'Copy';
-                    }, 2000);
-                }).catch(err => {
-                    console.error('Could not copy text: ', err);
-                });
+                // Use the Utils.copyToClipboard function for consistent behavior
+                Utils.copyToClipboard(codeText, copyButton);
             }
         });
     }
