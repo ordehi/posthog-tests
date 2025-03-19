@@ -137,6 +137,9 @@ function setupEventListeners() {
             input.addEventListener('input', function() {
                 saveInputValues();
                 updateCodePreview(getCurrentEndpoint(), getCurrentLanguage());
+                
+                // Clear any error states when changing inputs
+                clearValidationError(input);
             });
         }
     });
@@ -148,7 +151,33 @@ function setupEventListeners() {
             if (getCurrentEndpoint() === 'query') {
                 updateCodePreview('query', getCurrentLanguage());
             }
+            clearValidationError(queryInput);
         });
+    }
+    
+    // Add validation clearing for other inputs
+    if (eventNameInput) {
+        eventNameInput.addEventListener('input', () => clearValidationError(eventNameInput));
+    }
+    
+    if (distinctIdInput) {
+        distinctIdInput.addEventListener('input', () => clearValidationError(distinctIdInput));
+    }
+    
+    if (propertiesInput) {
+        propertiesInput.addEventListener('input', () => clearValidationError(propertiesInput));
+    }
+    
+    if (decideDistinctIdInput) {
+        decideDistinctIdInput.addEventListener('input', () => clearValidationError(decideDistinctIdInput));
+    }
+    
+    if (personPropertiesInput) {
+        personPropertiesInput.addEventListener('input', () => clearValidationError(personPropertiesInput));
+    }
+    
+    if (groupsInput) {
+        groupsInput.addEventListener('input', () => clearValidationError(groupsInput));
     }
     
     // Tab switching (from SQL client)
@@ -243,18 +272,30 @@ async function executeQueryAPI() {
         return;
     }
     
-    // Get common inputs
-    const connectionInfo = getConnectionInfo();
-    if (!connectionInfo) return;
+    // Clear previous error states
+    clearAllValidationErrors();
     
-    const { host, projectId, apiKey } = connectionInfo;
+    // Validate common inputs
+    const validationErrors = validateConnectionSettings();
+    
+    // Validate query-specific inputs
     const query = queryInput.value.trim();
-    
-    // Validate inputs
     if (!query) {
-        showError('SQL Query is required', queryStatus);
+        validationErrors.push({
+            element: queryInput,
+            message: 'SQL Query is required'
+        });
+    }
+    
+    // If there are validation errors, display them and stop
+    if (validationErrors.length > 0) {
+        displayValidationErrors(validationErrors);
         return;
     }
+    
+    // Get validated connection info
+    const connectionInfo = getConnectionInfo();
+    const { host, projectId, apiKey } = connectionInfo;
     
     // Show loading state
     updateEndpointUIForLoading('query', true);
@@ -299,35 +340,53 @@ async function executeCaptureAPI() {
         return;
     }
     
-    // Get common inputs
-    const connectionInfo = getConnectionInfo();
-    if (!connectionInfo) return;
+    // Clear previous error states
+    clearAllValidationErrors();
     
-    const { host, projectId, apiKey } = connectionInfo;
+    // Validate common inputs
+    const validationErrors = validateConnectionSettings();
+    
+    // Validate capture-specific inputs
     const eventName = eventNameInput.value.trim();
     const distinctId = distinctIdInput.value.trim();
     let properties = {};
+    
+    // Check required fields
+    if (!eventName) {
+        validationErrors.push({
+            element: eventNameInput,
+            message: 'Event name is required'
+        });
+    }
+    
+    if (!distinctId) {
+        validationErrors.push({
+            element: distinctIdInput,
+            message: 'Distinct ID is required'
+        });
+    }
     
     // Parse properties if provided
     if (propertiesInput.value.trim()) {
         try {
             properties = JSON.parse(propertiesInput.value);
         } catch (e) {
-            showError('Invalid JSON in properties', captureStatus);
-            return;
+            validationErrors.push({
+                element: propertiesInput,
+                message: 'Invalid JSON format in properties'
+            });
         }
     }
     
-    // Validate inputs
-    if (!eventName) {
-        showError('Event name is required', captureStatus);
+    // If there are validation errors, display them and stop
+    if (validationErrors.length > 0) {
+        displayValidationErrors(validationErrors);
         return;
     }
     
-    if (!distinctId) {
-        showError('Distinct ID is required', captureStatus);
-        return;
-    }
+    // Get validated connection info
+    const connectionInfo = getConnectionInfo();
+    const { host, projectId, apiKey } = connectionInfo;
     
     // Show loading state
     updateEndpointUIForLoading('capture', true);
@@ -368,22 +427,34 @@ async function executeDecideAPI() {
         return;
     }
     
-    // Get common inputs
-    const connectionInfo = getConnectionInfo();
-    if (!connectionInfo) return;
+    // Clear previous error states
+    clearAllValidationErrors();
     
-    const { host, projectId, apiKey } = connectionInfo;
+    // Validate common inputs
+    const validationErrors = validateConnectionSettings();
+    
+    // Validate decide-specific inputs
     const distinctId = decideDistinctIdInput.value.trim();
     let personProperties = {};
     let groups = {};
+    
+    // Check required fields
+    if (!distinctId) {
+        validationErrors.push({
+            element: decideDistinctIdInput,
+            message: 'Distinct ID is required'
+        });
+    }
     
     // Parse person properties if provided
     if (personPropertiesInput.value.trim()) {
         try {
             personProperties = JSON.parse(personPropertiesInput.value);
         } catch (e) {
-            showError('Invalid JSON in person properties', decideStatus);
-            return;
+            validationErrors.push({
+                element: personPropertiesInput,
+                message: 'Invalid JSON format in person properties'
+            });
         }
     }
     
@@ -392,16 +463,22 @@ async function executeDecideAPI() {
         try {
             groups = JSON.parse(groupsInput.value);
         } catch (e) {
-            showError('Invalid JSON in groups', decideStatus);
-            return;
+            validationErrors.push({
+                element: groupsInput,
+                message: 'Invalid JSON format in groups'
+            });
         }
     }
     
-    // Validate inputs
-    if (!distinctId) {
-        showError('Distinct ID is required', decideStatus);
+    // If there are validation errors, display them and stop
+    if (validationErrors.length > 0) {
+        displayValidationErrors(validationErrors);
         return;
     }
+    
+    // Get validated connection info
+    const connectionInfo = getConnectionInfo();
+    const { host, projectId, apiKey } = connectionInfo;
     
     // Show loading state
     updateEndpointUIForLoading('decide', true);
@@ -441,16 +518,130 @@ async function executeDecideAPI() {
 }
 
 /**
+ * Validate the connection settings
+ * @returns {Array} Array of validation error objects with element and message properties
+ */
+function validateConnectionSettings() {
+    const errors = [];
+    
+    // Check for host URL
+    if (hostSelect.value === 'custom') {
+        const customHost = customHostInput.value.trim();
+        if (!customHost) {
+            errors.push({
+                element: customHostInput,
+                message: 'Custom host URL is required'
+            });
+        } else if (!isValidUrl(customHost)) {
+            errors.push({
+                element: customHostInput,
+                message: 'Invalid URL format (should begin with http:// or https://)'
+            });
+        }
+    }
+    
+    // Check for project ID
+    const projectId = projectIdInput.value.trim();
+    if (!projectId) {
+        errors.push({
+            element: projectIdInput,
+            message: 'Project ID is required'
+        });
+    }
+    
+    // Check for API key
+    const apiKey = apiKeyInput.value.trim();
+    if (!apiKey) {
+        errors.push({
+            element: apiKeyInput,
+            message: 'API Key is required'
+        });
+    }
+    
+    return errors;
+}
+
+/**
+ * Check if a string is a valid URL
+ * @param {string} url - The URL to validate
+ * @returns {boolean} Whether the URL is valid
+ */
+function isValidUrl(url) {
+    try {
+        const urlObj = new URL(url);
+        return urlObj.protocol === 'http:' || urlObj.protocol === 'https:';
+    } catch (e) {
+        return false;
+    }
+}
+
+/**
+ * Display validation errors on the form
+ * @param {Array} errors - Array of validation error objects
+ */
+function displayValidationErrors(errors) {
+    errors.forEach(error => {
+        // Add error class to the element
+        error.element.classList.add('validation-error');
+        
+        // Get container of the element
+        const container = error.element.closest('.form-group');
+        
+        // Check if error message already exists
+        let errorMessage = container.querySelector('.error-message');
+        if (!errorMessage) {
+            // Create error message element
+            errorMessage = document.createElement('div');
+            errorMessage.className = 'error-message';
+            container.appendChild(errorMessage);
+        }
+        
+        // Set error message text
+        errorMessage.textContent = error.message;
+    });
+    
+    // Focus the first element with an error
+    if (errors.length > 0) {
+        errors[0].element.focus();
+    }
+}
+
+/**
+ * Clear all validation errors
+ */
+function clearAllValidationErrors() {
+    // Remove all error classes from inputs
+    document.querySelectorAll('.validation-error').forEach(element => {
+        clearValidationError(element);
+    });
+}
+
+/**
+ * Clear validation error for a specific element
+ * @param {HTMLElement} element - The element to clear errors for
+ */
+function clearValidationError(element) {
+    element.classList.remove('validation-error');
+    
+    // Get container of the element
+    const container = element.closest('.form-group');
+    if (container) {
+        // Remove error message element if it exists
+        const errorMessage = container.querySelector('.error-message');
+        if (errorMessage) {
+            errorMessage.remove();
+        }
+    }
+}
+
+/**
  * Get common connection information
  */
 function getConnectionInfo() {
     let host;
     if (hostSelect.value === 'custom') {
         host = customHostInput.value.trim();
-        if (!host) {
-            showError('Please enter a custom host URL');
-            return null;
-        }
+        
         // Remove trailing slash if present
         if (host.endsWith('/')) {
             host = host.slice(0, -1);
@@ -461,17 +652,6 @@ function getConnectionInfo() {
     
     const projectId = projectIdInput.value.trim();
     const apiKey = apiKeyInput.value.trim();
-    
-    // Validate inputs
-    if (!projectId) {
-        showError('Project ID is required');
-        return null;
-    }
-    
-    if (!apiKey) {
-        showError('API Key is required');
-        return null;
-    }
     
     return { host, projectId, apiKey };
 }
@@ -561,7 +741,7 @@ function showError(message, statusElement = null) {
 }
 
 /**
- * Set up endpoint switching
+ * Setup endpoint switching
  */
 function setupEndpointSwitching() {
     if (!endpointTabs || endpointTabs.length === 0) {
