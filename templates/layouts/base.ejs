@@ -5,9 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><%= title %> - PostHog Tools</title>
     <% 
+    // Determine the base path considering GitHub Pages deployment
+    // Get the current hostname to check if we're on GitHub Pages
+    const isGitHubPages = typeof window !== 'undefined' && window.location && window.location.hostname.includes('github.io');
+    const ghPagesPrefix = isGitHubPages ? '/posthog-tests' : '';
+    
     // Determine if we're in a nested path by checking currentPage
     const isNested = currentPage === 'selector-target';
-    const basePath = isNested ? '../' : './';
+    const basePath = isNested ? `${ghPagesPrefix}/../` : `${ghPagesPrefix}/`;
     %>
     <link rel="stylesheet" href="<%= basePath %>styles/main.css">
     <script src="<%= basePath %>scripts/posthog.js"></script>

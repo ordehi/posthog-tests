@@ -10,6 +10,10 @@ import * as Export from './api-client/export.js';
 import * as API from './api-client/api.js';
 import { updateCodePreview, getCurrentEndpoint, getCurrentLanguage } from './api-client/code-preview.js';
 
+// Base path detection for GitHub Pages
+const isGitHubPages = window.location.hostname.includes('github.io');
+const BASE_PATH = isGitHubPages ? '/posthog-tests' : '';
+
 // DOM Elements
 let hostSelect, customHostContainer, customHostInput, projectIdInput, apiKeyInput;
 let queryInput, queryButton, queryLoader, queryStatus, queryOutput;
@@ -35,6 +39,30 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Set up endpoint switching
     setupEndpointSwitching();
+    
+    // Ensure all links and resources use the correct base path
+    if (isGitHubPages) {
+        document.querySelectorAll('a').forEach(link => {
+            const href = link.getAttribute('href');
+            if (href && href.startsWith('/') && !href.startsWith('/posthog-tests') && !href.startsWith('//')) {
+                link.setAttribute('href', `${BASE_PATH}${href}`);
+            }
+        });
+        
+        document.querySelectorAll('script').forEach(script => {
+            const src = script.getAttribute('src');
+            if (src && src.startsWith('/') && !src.startsWith('/posthog-tests') && !src.startsWith('//')) {
+                script.setAttribute('src', `${BASE_PATH}${src}`);
+            }
+        });
+        
+        document.querySelectorAll('link').forEach(link => {
+            const href = link.getAttribute('href');
+            if (href && href.startsWith('/') && !href.startsWith('/posthog-tests') && !href.startsWith('//')) {
+                link.setAttribute('href', `${BASE_PATH}${href}`);
+            }
+        });
+    }
 });
 
 /**
@@ -622,3 +650,36 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   });
 });
+
+/**
+ * Export data as text file
+ */
+function exportAsText() {
+    const result = getResultForExport();
+    if (result) {
+        Export.exportAsText(result);
+    }
+}
+
+/**
+ * Export data as CSV file
+ */
+function exportAsCsv() {
+    const result = getResultForExport();
+    if (result) {
+        Export.exportAsCsv(result);
+    }
+}
+
+/**
+ * Get result for export
+ */
+function getResultForExport() {
+    try {
+        const preElement = rawOutputDiv.querySelector('pre');
+        return preElement ? JSON.parse(preElement.textContent) : null;
+    } catch (e) {
+        console.error('Error parsing JSON for export:', e);
+        return null;
+    }
+}
