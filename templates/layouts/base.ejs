@@ -5,9 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><%= title %> - PostHog Tools</title>
     <% 
-    // Determine if we're in a nested path by checking currentPage
-    const isNested = currentPage === 'selector-target';
-    const basePath = isNested ? '../' : './';
+    // Determine if we're in a nested path
+    const isNestedPage = typeof isNested !== 'undefined' ? isNested : currentPage === 'selector-target' || currentPage === 'custom-surveys';
+    const basePath = isNestedPage ? '../' : './';
     %>
     <link rel="stylesheet" href="<%= basePath %>styles/main.css">
     <script src="<%= basePath %>scripts/posthog.js"></script>

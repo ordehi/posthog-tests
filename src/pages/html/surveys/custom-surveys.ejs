@@ -1,0 +1,30 @@
+<% const content = `
+<div class="card">
+    <h2>Custom PostHog Surveys</h2>
+    
+    <div class="info-box">
+        <strong>Purpose:</strong> This page demonstrates a custom PostHog survey implementation with enhanced UI and user experience.
+    </div>
+
+    <div id="survey-container" class="survey-container">
+        <div class="loading-spinner" id="loading">
+            <div class="spinner"></div>
+        </div>
+        <!-- Survey content will be dynamically added here -->
+    </div>
+
+    <div class="controls">
+        <button id="reset-survey-btn" class="btn">Reset Survey</button>
+    </div>
+</div>
+
+<script src="/scripts/custom-surveys.js"></script>
+` %>
+
+<%- include('../../../templates/layouts/base', {
+    title: 'Custom PostHog Surveys',
+    subtitle: 'Enhanced survey experience with custom UI',
+    currentPage: 'custom-surveys',
+    isNested: true,
+    content: content
+}) %> 

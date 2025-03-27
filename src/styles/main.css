@@ -1,3 +1,6 @@
+/* Main CSS */
+@import url('./custom-surveys.css');
+
 :root {
     --primary-color: #24b47e;
     --secondary-color: #f9bd2b;
