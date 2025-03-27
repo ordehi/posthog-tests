@@ -10,7 +10,7 @@
                 <span>Surveys</span>
                 <button class="toggle-btn" aria-expanded="false">▶</button>
             </div>
-            <ul class="nav-section-content" style="display: none;">
+            <ul class="nav-section-content">
                 <li><a href="<%= basePath %>surveys/selector-target" <%= currentPage === 'selector-target' ? 'class="active"' : '' %>>Selector Target</a></li>
                 <li><a href="<%= basePath %>surveys/custom-surveys" <%= currentPage === 'custom-surveys' ? 'class="active"' : '' %>>Custom Surveys</a></li>
             </ul>
@@ -44,14 +44,45 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Add click handlers to toggle buttons
     navSections.forEach(section => {
+        const header = section.querySelector('.nav-section-header');
         const toggleBtn = section.querySelector('.toggle-btn');
         const content = section.querySelector('.nav-section-content');
         
-        toggleBtn.addEventListener('click', () => {
+        // Initially hide all section content
+        content.style.display = 'none';
+        
+        // Function to toggle dropdown
+        const toggleDropdown = (e) => {
+            e.stopPropagation(); // Prevent event from bubbling up
+            
+            // Close all other dropdowns first
+            navSections.forEach(otherSection => {
+                if (otherSection !== section) {
+                    const otherBtn = otherSection.querySelector('.toggle-btn');
+                    const otherContent = otherSection.querySelector('.nav-section-content');
+                    otherBtn.setAttribute('aria-expanded', 'false');
+                    otherBtn.textContent = '▶';
+                    otherContent.style.display = 'none';
+                }
+            });
+            
+            // Toggle current dropdown
             const isExpanded = toggleBtn.getAttribute('aria-expanded') === 'true';
             toggleBtn.setAttribute('aria-expanded', !isExpanded);
             toggleBtn.textContent = isExpanded ? '▶' : '▼';
             content.style.display = isExpanded ? 'none' : 'block';
+        };
+        
+        // Make the entire header clickable
+        header.addEventListener('click', toggleDropdown);
+        
+        // Close dropdown when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!section.contains(e.target)) {
+                toggleBtn.setAttribute('aria-expanded', 'false');
+                toggleBtn.textContent = '▶';
+                content.style.display = 'none';
+            }
         });
     });
 });
