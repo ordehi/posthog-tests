@@ -30,28 +30,68 @@ const mockSurvey = {
     ]
 };
 
-// Wait for DOM to be loaded
-document.addEventListener('DOMContentLoaded', () => {
+// Check if PostHog is ready and register callbacks
+function checkPostHogReady() {
     // Add event listener to reset button
     const resetBtn = document.getElementById('reset-survey-btn');
     if (resetBtn) {
         resetBtn.addEventListener('click', resetSurvey);
     }
 
-    // Register PostHog survey loaded listener
-    if (typeof posthog !== 'undefined') {
-        posthog.onSurveysLoaded(() => {
-            console.log('PostHog surveys loaded');
-            fetchSurveys();
-        });
+    // Function to initialize PostHog survey listeners
+    const initializePostHog = () => {
+        if (typeof posthog !== 'undefined' && posthog.__loaded) {
+            console.log('PostHog loaded - registering survey listeners');
+            
+            // Clear the interval once PostHog is ready
+            if (window.postHogCheckInterval) {
+                clearInterval(window.postHogCheckInterval);
+                window.postHogCheckInterval = null;
+            }
+            
+            // Register survey loaded listener
+            posthog.onSurveysLoaded(() => {
+                console.log('PostHog surveys loaded');
+                fetchSurveys();
+            });
+        } else {
+            console.log('PostHog not loaded yet, using mock data');
+            setTimeout(() => {
+                handleSurveys([mockSurvey]);
+            }, 1000);
+        }
+    };
+
+    // Check if PostHog is already loaded
+    if (typeof posthog !== 'undefined' && posthog.__loaded) {
+        initializePostHog();
     } else {
-        // If PostHog is not available, use mock data after a short delay
-        console.log('PostHog not detected, using mock data');
+        // Set up a listener for PostHog to load
+        window.addEventListener('posthog_loaded', initializePostHog);
+        
+        // Also set a backup interval to check if PostHog has loaded
+        window.postHogCheckInterval = setInterval(() => {
+            if (typeof posthog !== 'undefined' && posthog.__loaded) {
+                initializePostHog();
+            }
+        }, 500);
+        
+        // Set a timeout to fall back to mock data if PostHog doesn't load
         setTimeout(() => {
-            handleSurveys([mockSurvey]);
-        }, 1000);
+            if (!window.posthogInitialized) {
+                if (window.postHogCheckInterval) {
+                    clearInterval(window.postHogCheckInterval);
+                    window.postHogCheckInterval = null;
+                }
+                console.log('PostHog failed to load in time, using mock data');
+                handleSurveys([mockSurvey]);
+            }
+        }, 5000);
     }
-});
+}
+
+// Wait for DOM to be loaded
+document.addEventListener('DOMContentLoaded', checkPostHogReady);
 
 // Reset the survey
 function resetSurvey() {
@@ -75,7 +115,7 @@ function resetSurvey() {
 
 // Fetch surveys from PostHog
 function fetchSurveys() {
-    if (typeof posthog !== 'undefined') {
+    if (typeof posthog !== 'undefined' && posthog.__loaded) {
         posthog.getActiveMatchingSurveys((surveys) => {
             if (surveys && surveys.length > 0) {
                 handleSurveys(surveys);
