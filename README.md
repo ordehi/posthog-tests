@@ -27,10 +27,11 @@ posthog-tests/
 ├── templates/
 │   ├── layouts/        # Base layout templates
 │   └── partials/       # Reusable partial templates
-├── docs/              # Built static site (generated)
-├── build.js           # Build script
-├── server.js          # Development server
-└── package.json       # Project configuration
+├── docs/               # Built static site (generated)
+│   └── PATH_HANDLING.md # Documentation for path handling
+├── build.js            # Build script
+├── server.js           # Development server
+└── package.json        # Project configuration
 ```
 
 ## Development
@@ -82,6 +83,16 @@ This will:
    ```bash
    npm run build
    ```
+
+### Important: Path Handling
+
+This project uses a special path handling mechanism for GitHub Pages compatibility. For details, see:
+- [Path Handling Documentation](docs/PATH_HANDLING.md)
+
+**TL;DR:**
+- Always use `<%= basePath %>` for resource paths in templates
+- For nested pages, set `isNested: true` in the template parameters
+- Never use absolute paths starting with `/` for resources
 
 ### Directory Structure for URLs
 

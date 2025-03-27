@@ -6,7 +6,8 @@ const config = {
     srcDir: 'src',
     outputDir: 'dist',  // Changed to dist for temporary build
     templatesDir: 'templates',
-    pagesDir: 'src/pages'
+    pagesDir: 'src/pages',
+    docsDir: 'docs'
 };
 
 // Ensure directory exists
@@ -27,6 +28,19 @@ function copyFileOrDir(src, dest) {
         });
     } else {
         fs.copyFileSync(src, dest);
+    }
+}
+
+// Copy documentation files
+function copyDocs() {
+    if (fs.existsSync(config.docsDir)) {
+        const docs = fs.readdirSync(config.docsDir);
+        docs.forEach(doc => {
+            const srcPath = path.join(config.docsDir, doc);
+            const destPath = path.join(config.outputDir, doc);
+            fs.copyFileSync(srcPath, destPath);
+            console.log(`Copied: ${srcPath} → ${destPath}`);
+        });
     }
 }
 
@@ -150,6 +164,9 @@ async function build() {
 
         // Copy static assets first
         copyStaticAssets();
+
+        // Copy documentation files
+        copyDocs();
 
         // Build all pages
         await buildPages();

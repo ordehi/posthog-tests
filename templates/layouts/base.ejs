@@ -8,6 +8,19 @@
     // Determine if we're in a nested path
     const isNestedPage = typeof isNested !== 'undefined' ? isNested : currentPage === 'selector-target' || currentPage === 'custom-surveys';
     const basePath = isNestedPage ? '../' : './';
+    
+    // Function to transform absolute paths to GitHub Pages compatible paths
+    function transformScriptPath(path) {
+        if (path.startsWith('/')) {
+            return basePath + path.substring(1);
+        }
+        return path;
+    }
+    
+    // Process content to transform any absolute script paths
+    if (typeof content === 'string') {
+        content = content.replace(/<script src="\/([^"]+)"/g, '<script src="' + basePath + '$1"');
+    }
     %>
     <link rel="stylesheet" href="<%= basePath %>styles/main.css">
     <script src="<%= basePath %>scripts/posthog.js"></script>
