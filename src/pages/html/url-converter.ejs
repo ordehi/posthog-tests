@@ -1,0 +1,66 @@
+<% const content = `
+<div class="insights-url-converter" style="max-width: 600px; margin: 2rem auto;">
+    <div class="card">
+        <div class="card-body">
+            <h2 class="mb-3">Insights URL Converter</h2>
+            <p class="mb-4 text-muted">Convert a project-specific PostHog Insights URL into a shareable template link. <br> <strong>Why?</strong> This allows you to share insights templates with other users, so anyone can open and save the insight in their own project.</p>
+            <div class="form-group mb-3">
+                <label for="inputUrl">Enter PostHog URL:</label>
+                <input type="text" id="inputUrl" class="form-control" placeholder="https://us.posthog.com/project/...">
+            </div>
+            <button class="btn btn-primary mb-3" onclick="convertUrl()">Convert URL</button>
+            <div id="result" class="mt-3" style="display: none;"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function convertUrl() {
+        const inputUrl = document.getElementById('inputUrl').value;
+        const resultDiv = document.getElementById('result');
+        
+        try {
+            // Create URL object to parse the input
+            const url = new URL(inputUrl);
+            
+            // Extract the path parts
+            const pathParts = url.pathname.split('/');
+            
+            // Create new URL with app.posthog.com
+            const newUrl = new URL('https://app.posthog.com');
+            
+            // Add the path after 'insights'
+            const insightIndex = pathParts.indexOf('insights');
+            if (insightIndex !== -1) {
+                newUrl.pathname = pathParts.slice(insightIndex).join('/');
+            }
+            
+            // Add the hash fragment
+            newUrl.hash = url.hash;
+            
+            // Display the result with a copy button
+            resultDiv.style.display = 'block';
+            resultDiv.innerHTML = '<div class="alert alert-success">' +
+                '<p><strong>Converted URL:</strong></p>' +
+                '<div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">' +
+                '<a id="convertedUrl" href="' + newUrl.toString() + '" target="_blank">' + newUrl.toString() + '</a>' +
+                '<button class="btn btn-secondary btn-sm" onclick="copyConvertedUrl()" style="margin-left: 0.5rem;">Copy</button>' +
+                '</div>' +
+                '</div>';
+        } catch (error) {
+            resultDiv.style.display = 'block';
+            resultDiv.innerHTML = '<div class="alert alert-danger">Error: Please enter a valid PostHog URL</div>';
+        }
+    }
+
+    function copyConvertedUrl() {
+        const url = document.getElementById('convertedUrl').href;
+        navigator.clipboard.writeText(url).then(function() {
+            // Optionally show feedback
+            alert('Copied!');
+        });
+    }
+</script>
+` %>
+
+<%- content %> 
