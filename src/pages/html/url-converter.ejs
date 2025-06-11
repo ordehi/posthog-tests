@@ -1,9 +1,24 @@
+<% const howToUseContent = `
+    <ol style="padding-left: 1.2em;">
+        <li>Create a new insight in PostHog.</li>
+        <li>After you configure all the parameters and <b>before saving it</b>, copy the URL from your browser's address bar.</li>
+        <li>Paste the URL here to convert it to a shareable insight template URL.</li>
+        <li>Other PostHog users can use the converted URL to get the same insight you created, as long as they have the same events and properties you configured.</li>
+    </ol>
+    <div class="text-muted" style="font-size: 0.95em;">This is helpful for sharing insight templates with others, so they can easily recreate your analysis in their own project.</div>
+` %>
+
 <% const content = `
 <div class="insights-url-converter" style="max-width: 600px; margin: 2rem auto;">
     <div class="card">
         <div class="card-body">
             <h2 class="mb-3">Insights URL Converter</h2>
-            <p class="mb-4 text-muted">Convert a project-specific PostHog Insights URL into a shareable template link. <br> <strong>Why?</strong> This allows you to share insights templates with other users, so anyone can open and save the insight in their own project.</p>
+            <div class="mb-4">
+                ${include('../../../templates/components/collapsible', {
+                    title: 'How to use this tool',
+                    content: howToUseContent
+                })}
+            </div>
             <div class="form-group mb-3">
                 <label for="inputUrl">Enter PostHog URL:</label>
                 <input type="text" id="inputUrl" class="form-control" placeholder="https://us.posthog.com/project/...">
@@ -44,7 +59,7 @@
                 '<p><strong>Converted URL:</strong></p>' +
                 '<div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">' +
                 '<a id="convertedUrl" href="' + newUrl.toString() + '" target="_blank">' + newUrl.toString() + '</a>' +
-                '<button class="btn btn-secondary btn-sm" onclick="copyConvertedUrl()" style="margin-left: 0.5rem;">Copy</button>' +
+                '<button id="copyBtn" class="btn btn-secondary btn-sm" onclick="copyConvertedUrl()" style="margin-left: 0.5rem;">Copy</button>' +
                 '</div>' +
                 '</div>';
         } catch (error) {
@@ -55,12 +70,24 @@
 
     function copyConvertedUrl() {
         const url = document.getElementById('convertedUrl').href;
+        const btn = document.getElementById('copyBtn');
         navigator.clipboard.writeText(url).then(function() {
-            // Optionally show feedback
-            alert('Copied!');
+            if (btn) {
+                btn.textContent = 'Copied';
+                btn.disabled = true;
+                setTimeout(function() {
+                    btn.textContent = 'Copy';
+                    btn.disabled = false;
+                }, 1500);
+            }
         });
     }
 </script>
 ` %>
 
-<%- content %> 
+<%- include('../../../templates/layouts/base', {
+    title: 'Insights URL Converter',
+    subtitle: 'Convert PostHog insights URLs to shareable templates',
+    currentPage: 'url-converter',
+    content: content
+}) %> 

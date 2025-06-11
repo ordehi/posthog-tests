@@ -1,0 +1,24 @@
+<div class="collapsible-section" style="margin-bottom: 1rem;">
+    <button class="collapsible-toggle" type="button" style="display: flex; align-items: center; gap: 0.5em; background: none; border: none; font-size: 1em; font-weight: 500; cursor: pointer; padding: 0;">
+        <span class="collapsible-arrow" style="transition: transform 0.2s;">&#9654;</span>
+        <span><%= title %></span>
+    </button>
+    <div class="collapsible-content" style="display: none; margin-top: 0.5em;">
+        <%- content %>
+    </div>
+</div>
+<script>
+(function() {
+    var section = document.currentScript.parentElement;
+    var toggle = section.querySelector('.collapsible-toggle');
+    var content = section.querySelector('.collapsible-content');
+    var arrow = section.querySelector('.collapsible-arrow');
+    if (toggle && content && arrow) {
+        toggle.addEventListener('click', function() {
+            var isOpen = content.style.display === 'block';
+            content.style.display = isOpen ? 'none' : 'block';
+            arrow.style.transform = isOpen ? 'rotate(0deg)' : 'rotate(90deg)';
+        });
+    }
+})();
+</script> 
