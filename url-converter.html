@@ -1,0 +1,227 @@
+
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Insights URL Converter - PostHog Tools</title>
+    
+    <link rel="stylesheet" href="./styles/main.css">
+    <script src="./scripts/posthog.js"></script>
+    
+</head>
+<body>
+    <header>
+    <h1>Insights URL Converter</h1>
+    
+        <p class="subtitle">Convert PostHog insights URLs to shareable templates</p>
+    
+</header>
+    <nav>
+    <ul>
+        <li><a href="./" >Home</a></li>
+        <li><a href="./flag-debugger" >Feature Flag Debugger</a></li>
+        <li><a href="./api-client" >API Client</a></li>
+        <li><a href="./url-converter" class=&#34;active&#34;>URL Converter</a></li>
+        
+        <!-- Surveys Section -->
+        <li class="nav-section">
+            <div class="nav-section-header">
+                <span>Surveys</span>
+                <button class="toggle-btn" aria-expanded="false">▶</button>
+            </div>
+            <ul class="nav-section-content">
+                <li><a href="./surveys/selector-target" >Selector Target</a></li>
+                <li><a href="./surveys/custom-surveys" >Custom Surveys</a></li>
+            </ul>
+        </li>
+    </ul>
+</nav>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Get all nav sections
+    const navSections = document.querySelectorAll('.nav-section');
+    
+    // Check if current page is in a section
+    const currentPath = window.location.pathname.replace('/posthog-tests/', '/');
+    const currentSection = Array.from(navSections).find(section => {
+        const links = section.querySelectorAll('a');
+        return Array.from(links).some(link => {
+            const href = link.getAttribute('href').replace('./', '/').replace('../', '/');
+            return href === currentPath;
+        });
+    });
+
+    // If current page is in a section, expand that section
+    if (currentSection) {
+        const toggleBtn = currentSection.querySelector('.toggle-btn');
+        const content = currentSection.querySelector('.nav-section-content');
+        toggleBtn.setAttribute('aria-expanded', 'true');
+        toggleBtn.textContent = '▼';
+        content.style.display = 'block';
+    }
+
+    // Add click handlers to toggle buttons
+    navSections.forEach(section => {
+        const header = section.querySelector('.nav-section-header');
+        const toggleBtn = section.querySelector('.toggle-btn');
+        const content = section.querySelector('.nav-section-content');
+        
+        // Initially hide all section content
+        content.style.display = 'none';
+        
+        // Function to toggle dropdown
+        const toggleDropdown = (e) => {
+            e.stopPropagation(); // Prevent event from bubbling up
+            
+            // Close all other dropdowns first
+            navSections.forEach(otherSection => {
+                if (otherSection !== section) {
+                    const otherBtn = otherSection.querySelector('.toggle-btn');
+                    const otherContent = otherSection.querySelector('.nav-section-content');
+                    otherBtn.setAttribute('aria-expanded', 'false');
+                    otherBtn.textContent = '▶';
+                    otherContent.style.display = 'none';
+                }
+            });
+            
+            // Toggle current dropdown
+            const isExpanded = toggleBtn.getAttribute('aria-expanded') === 'true';
+            toggleBtn.setAttribute('aria-expanded', !isExpanded);
+            toggleBtn.textContent = isExpanded ? '▶' : '▼';
+            content.style.display = isExpanded ? 'none' : 'block';
+        };
+        
+        // Make the entire header clickable
+        header.addEventListener('click', toggleDropdown);
+        
+        // Close dropdown when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!section.contains(e.target)) {
+                toggleBtn.setAttribute('aria-expanded', 'false');
+                toggleBtn.textContent = '▶';
+                content.style.display = 'none';
+            }
+        });
+    });
+});
+</script>
+    
+    <main>
+        
+<div class="insights-url-converter" style="max-width: 600px; margin: 2rem auto;">
+    <div class="card">
+        <div class="card-body">
+            <h2 class="mb-3">Insights URL Converter</h2>
+            <div class="mb-4">
+                <div class="collapsible-section" style="margin-bottom: 1rem;">
+    <button class="collapsible-toggle" type="button" style="display: flex; align-items: center; gap: 0.5em; background: none; border: none; font-size: 1em; font-weight: 500; cursor: pointer; padding: 0;">
+        <span class="collapsible-arrow" style="transition: transform 0.2s;">&#9654;</span>
+        <span>How to use this tool</span>
+    </button>
+    <div class="collapsible-content" style="display: none; margin-top: 0.5em;">
+        
+    <ol style="padding-left: 1.2em;">
+        <li>Create a new insight in PostHog.</li>
+        <li>After you configure all the parameters and <b>before saving it</b>, copy the URL from your browser's address bar.</li>
+        <li>Paste the URL here to convert it to a shareable insight template URL.</li>
+        <li>Other PostHog users can use the converted URL to get the same insight you created, as long as they have the same events and properties you configured.</li>
+    </ol>
+    <div class="text-muted" style="font-size: 0.95em;">This is helpful for sharing insight templates with others, so they can easily recreate your analysis in their own project.</div>
+
+    </div>
+</div>
+<script>
+(function() {
+    var section = document.currentScript.parentElement;
+    var toggle = section.querySelector('.collapsible-toggle');
+    var content = section.querySelector('.collapsible-content');
+    var arrow = section.querySelector('.collapsible-arrow');
+    if (toggle && content && arrow) {
+        toggle.addEventListener('click', function() {
+            var isOpen = content.style.display === 'block';
+            content.style.display = isOpen ? 'none' : 'block';
+            arrow.style.transform = isOpen ? 'rotate(0deg)' : 'rotate(90deg)';
+        });
+    }
+})();
+</script> 
+            </div>
+            <div class="form-group mb-3">
+                <label for="inputUrl">Enter PostHog URL:</label>
+                <input type="text" id="inputUrl" class="form-control" placeholder="https://us.posthog.com/project/...">
+            </div>
+            <button class="btn btn-primary mb-3" onclick="convertUrl()">Convert URL</button>
+            <div id="result" class="mt-3" style="display: none;"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function convertUrl() {
+        const inputUrl = document.getElementById('inputUrl').value;
+        const resultDiv = document.getElementById('result');
+        
+        try {
+            // Create URL object to parse the input
+            const url = new URL(inputUrl);
+            
+            // Extract the path parts
+            const pathParts = url.pathname.split('/');
+            
+            // Create new URL with app.posthog.com
+            const newUrl = new URL('https://app.posthog.com');
+            
+            // Add the path after 'insights'
+            const insightIndex = pathParts.indexOf('insights');
+            if (insightIndex !== -1) {
+                newUrl.pathname = pathParts.slice(insightIndex).join('/');
+            }
+            
+            // Add the hash fragment
+            newUrl.hash = url.hash;
+            
+            // Display the result with a copy button
+            resultDiv.style.display = 'block';
+            resultDiv.innerHTML = '<div class="alert alert-success">' +
+                '<p><strong>Converted URL:</strong></p>' +
+                '<div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">' +
+                '<a id="convertedUrl" href="' + newUrl.toString() + '" target="_blank">' + newUrl.toString() + '</a>' +
+                '<button id="copyBtn" class="btn btn-secondary btn-sm" onclick="copyConvertedUrl()" style="margin-left: 0.5rem;">Copy</button>' +
+                '</div>' +
+                '</div>';
+        } catch (error) {
+            resultDiv.style.display = 'block';
+            resultDiv.innerHTML = '<div class="alert alert-danger">Error: Please enter a valid PostHog URL</div>';
+        }
+    }
+
+    function copyConvertedUrl() {
+        const url = document.getElementById('convertedUrl').href;
+        const btn = document.getElementById('copyBtn');
+        navigator.clipboard.writeText(url).then(function() {
+            if (btn) {
+                btn.textContent = 'Copied';
+                btn.disabled = true;
+                setTimeout(function() {
+                    btn.textContent = 'Copy';
+                    btn.disabled = false;
+                }, 1500);
+            }
+        });
+    }
+</script>
+
+    </main>
+
+    <footer>
+    <p>PostHog Tools Hub | For demonstration and testing purposes only</p>
+</footer>
+
+    
+</body>
+</html> 

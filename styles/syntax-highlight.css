@@ -1,0 +1,74 @@
+/* Syntax highlighting styles adapted from Highlight.js Dark theme */
+.hljs {
+  display: block;
+  overflow-x: auto;
+  padding: 0.5em;
+  color: #f8f8f2;
+  background: transparent;
+}
+
+.hljs-comment,
+.hljs-quote {
+  color: #a0a0a0;
+  font-style: italic;
+}
+
+.hljs-keyword,
+.hljs-selector-tag,
+.hljs-literal,
+.hljs-name {
+  color: #f92672;
+}
+
+.hljs-variable,
+.hljs-template-variable {
+  color: #66d9ef;
+}
+
+.hljs-string,
+.hljs-regexp,
+.hljs-addition,
+.hljs-attribute,
+.hljs-meta-string {
+  color: #a6e22e;
+}
+
+.hljs-built_in,
+.hljs-class .hljs-title {
+  color: #e6db74;
+}
+
+.hljs-attr,
+.hljs-number,
+.hljs-selector-attr,
+.hljs-selector-class,
+.hljs-selector-pseudo,
+.hljs-template-tag,
+.hljs-type,
+.hljs-subst {
+  color: #66d9ef;
+}
+
+.hljs-symbol,
+.hljs-bullet,
+.hljs-link,
+.hljs-meta,
+.hljs-selector-id,
+.hljs-title {
+  color: #ae81ff;
+}
+
+.hljs-section,
+.hljs-doctag,
+.hljs-deletion,
+.hljs-strong {
+  font-weight: bold;
+}
+
+.hljs-emphasis {
+  font-style: italic;
+}
+
+.hljs-function {
+  color: #fd971f;
+} 

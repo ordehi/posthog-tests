@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>404 - Page Not Found</title>
+    <link rel="stylesheet" href="./styles/main.css">
+    <script src="./scripts/posthog.js"></script>
+</head>
+<body>
+    <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>404 - Page Not Found - PostHog Tools</title>
+    
+    <link rel="stylesheet" href="./styles/main.css">
+    <script src="./scripts/posthog.js"></script>
+    
+</head>
+<body>
+    <header>
+    <h1>404 - Page Not Found</h1>
+    
+        <p class="subtitle">The page you are looking for could not be found.</p>
+    
+</header>
+    <nav>
+    <ul>
+        <li><a href="./" >Home</a></li>
+        <li><a href="./flag-debugger" >Feature Flag Debugger</a></li>
+        <li><a href="./api-client" >API Client</a></li>
+        <li><a href="./url-converter" >URL Converter</a></li>
+        
+        <!-- Surveys Section -->
+        <li class="nav-section">
+            <div class="nav-section-header">
+                <span>Surveys</span>
+                <button class="toggle-btn" aria-expanded="false">▶</button>
+            </div>
+            <ul class="nav-section-content">
+                <li><a href="./surveys/selector-target" >Selector Target</a></li>
+                <li><a href="./surveys/custom-surveys" >Custom Surveys</a></li>
+            </ul>
+        </li>
+    </ul>
+</nav>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Get all nav sections
+    const navSections = document.querySelectorAll('.nav-section');
+    
+    // Check if current page is in a section
+    const currentPath = window.location.pathname.replace('/posthog-tests/', '/');
+    const currentSection = Array.from(navSections).find(section => {
+        const links = section.querySelectorAll('a');
+        return Array.from(links).some(link => {
+            const href = link.getAttribute('href').replace('./', '/').replace('../', '/');
+            return href === currentPath;
+        });
+    });
+
+    // If current page is in a section, expand that section
+    if (currentSection) {
+        const toggleBtn = currentSection.querySelector('.toggle-btn');
+        const content = currentSection.querySelector('.nav-section-content');
+        toggleBtn.setAttribute('aria-expanded', 'true');
+        toggleBtn.textContent = '▼';
+        content.style.display = 'block';
+    }
+
+    // Add click handlers to toggle buttons
+    navSections.forEach(section => {
+        const header = section.querySelector('.nav-section-header');
+        const toggleBtn = section.querySelector('.toggle-btn');
+        const content = section.querySelector('.nav-section-content');
+        
+        // Initially hide all section content
+        content.style.display = 'none';
+        
+        // Function to toggle dropdown
+        const toggleDropdown = (e) => {
+            e.stopPropagation(); // Prevent event from bubbling up
+            
+            // Close all other dropdowns first
+            navSections.forEach(otherSection => {
+                if (otherSection !== section) {
+                    const otherBtn = otherSection.querySelector('.toggle-btn');
+                    const otherContent = otherSection.querySelector('.nav-section-content');
+                    otherBtn.setAttribute('aria-expanded', 'false');
+                    otherBtn.textContent = '▶';
+                    otherContent.style.display = 'none';
+                }
+            });
+            
+            // Toggle current dropdown
+            const isExpanded = toggleBtn.getAttribute('aria-expanded') === 'true';
+            toggleBtn.setAttribute('aria-expanded', !isExpanded);
+            toggleBtn.textContent = isExpanded ? '▶' : '▼';
+            content.style.display = isExpanded ? 'none' : 'block';
+        };
+        
+        // Make the entire header clickable
+        header.addEventListener('click', toggleDropdown);
+        
+        // Close dropdown when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!section.contains(e.target)) {
+                toggleBtn.setAttribute('aria-expanded', 'false');
+                toggleBtn.textContent = '▶';
+                content.style.display = 'none';
+            }
+        });
+    });
+});
+</script>
+    
+    <main>
+        
+            <div class="card">
+                <h2>404 - Page Not Found</h2>
+                <p>The page you are looking for could not be found.</p>
+                <div class="button-container">
+                    <a href="/" class="btn">Return to Home</a>
+                </div>
+            </div>
+        
+    </main>
+
+    <footer>
+    <p>PostHog Tools Hub | For demonstration and testing purposes only</p>
+</footer>
+
+    
+</body>
+</html>
+</body>
+</html> 
